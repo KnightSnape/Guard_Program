@@ -58,8 +58,6 @@ Visualization Manager:
         All Enabled: true
         base_link:
           Value: true
-        body:
-          Value: true
         camera_init:
           Value: true
         map:
@@ -74,19 +72,8 @@ Visualization Manager:
         base_link:
           map:
             camera_init:
-              body:
-                {}
+              {}
       Update Interval: 0
-      Value: true
-    - Alpha: 0.699999988079071
-      Class: rviz/Map
-      Color Scheme: map
-      Draw Behind: false
-      Enabled: true
-      Name: Map
-      Topic: /map
-      Unreliable: false
-      Use Timestamp: false
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -151,6 +138,16 @@ Visualization Manager:
       Topic: /Odometry_2d
       Unreliable: false
       Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /grid_map
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -179,7 +176,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 63.39756393432617
+      Distance: 0.7244877219200134
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -187,17 +184,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.5391965508460999
-        Y: 1.2293026447296143
-        Z: 2.2601726055145264
+        X: -0.14165526628494263
+        Y: 3.0655057430267334
+        Z: 2.0271124839782715
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4403979778289795
+      Pitch: 0.6147966384887695
       Target Frame: <Fixed Frame>
-      Yaw: 2.0849528312683105
+      Yaw: 1.674955129623413
     Saved: ~
 Window Geometry:
   Displays:

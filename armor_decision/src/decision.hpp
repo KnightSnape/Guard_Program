@@ -4,27 +4,15 @@
 #include<mutex>
 #include"Timer.h"
 #include"decision_tree.h"
-#include"blackboard.hpp"
+#include"utility/blackboard.hpp"
 
 #include"log_executor.hpp"
 #include"warn_executor.hpp"
 #include"chassis_executor.hpp"
+#include"gimbal_executor.hpp"
 
-#include"add_blood.hpp"
-#include"attack_enemy.hpp"
-#include"attack_outpost.hpp"
-#include"chase.hpp"
-#include"defend_base.hpp"
-#include"defend_outpost.hpp"
-#include"game_start.hpp"
-#include"help_others.hpp"
-#include"midplaceoccpuy.hpp"
-#include"protect_hero.hpp"
-#include"retreat.hpp"
-#include"calculate_point.hpp"
-#include"time_get.hpp"
-#include"goto_place.hpp"
 #include"race_choose.hpp"
+#include"game_start.hpp"
 
 namespace decision_tree
 {
@@ -43,10 +31,15 @@ namespace decision_tree
             }
             void ExecuteLoop();
             void visualize();
+            void LeagueTreeBuild();
+            void MatchTreeBuild();
         private:
-            SelectorNode* root_node;
+            Race_Choose* root_node;
+            SequenceNode* League_node;
+            SequenceNode* Match_node;
             Blackboard::Ptr blackboard_;
             Chassis_executor::Ptr chassis_exe_;
+            Gimbal_executor::Ptr gimbal_exe_;
             Log_executor::Ptr log_exe_;
             Warn_executor::Ptr warm_exe_;
             cv::Mat map_;

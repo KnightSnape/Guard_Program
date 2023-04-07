@@ -27,23 +27,12 @@ class Log_executor
                 t->tm_hour, 
                 t->tm_min,
                 t->tm_sec);
-            // outFile = std::ofstream(ros::package::getPath("robot_decision") + str, std::ios_base::out);
-            // if(outFile.is_open())
-            // {
-            //     create_ = true;
-            // }
-            // else
-            // {
-            //     std::cout << "\033[0;1;31m" << "Log Init Failed"  << "\033[0m" << std::endl;
-            // }
         }
         ~Log_executor(){}
         void print(std::stringstream& str_stream)
         {
             if(!create_)
                 return;
-            // std::cout << str_stream.str() << std::endl;
-            // outFile << str_stream.str() << std::endl;
         }
     
     private:

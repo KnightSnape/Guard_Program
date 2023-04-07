@@ -11,49 +11,19 @@ namespace decision_tree
         //导入新地图
         blackboard_ = std::make_shared<Blackboard>();
         chassis_exe_ = std::make_shared<Chassis_executor>();
+        gimbal_exe_ = std::make_shared<Gimbal_executor>();
         log_exe_ = std::make_shared<Log_executor>();
         warm_exe_ = std::make_shared<Warn_executor>();
 
         //根节点需要用时间的Selector
-        root_node = new SelectorNode("robot_decision",0,blackboard_,chassis_exe_,log_exe_,warm_exe_);
+        root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,warm_exe_);
         //选择联盟赛行为树还是对抗赛行为树
-        Race_Choose* race_choose = new Race_Choose("race_choose",1,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        root_node->addChild(race_choose);     
-        //联盟赛或对抗赛的根节点
-        SelectorNode* League = new SelectorNode("league",2,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        SelectorNode* Match = new SelectorNode("match",2,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        //联盟赛行为树准备搭建
-        //RMUL
-        race_choose->addChild(League);
-        //RMUC
-        race_choose->addChild(Match);
 
-        //游戏开始节点(可能还需要改，需要考虑里程寄问题)
-        GameStart* game_start_node = new GameStart("gamestart",3,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        
-        League->addChild(game_start_node);
-        Match->addChild(game_start_node);
-
-        //下面是联盟赛的行为树子节点
-        SelectorNode* first_four_minute_node = new SelectorNode("first_four_minute",3,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        League->addChild(first_four_minute_node);
-
-        //第一个需要有需要回血检测，在满足相应的条件下进行回血行为
-        Add_Blood* add_blood_node = new Add_Blood("add_bloods",4,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        //而在对于没有回血流程中，它会原地陀螺并且攻击已经看到的目标，若没有就缓慢扫视
-        AttackEnemy* attack_enemy_node = new AttackEnemy("attack_enemys",4,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-        
-        first_four_minute_node->addChild(add_blood_node);
-        first_four_minute_node->addChild(attack_enemy_node);
-
-        AttackEnemy* final_attack = new AttackEnemy("final_attack",3,blackboard_,chassis_exe_,log_exe_,warm_exe_);
-
-        League->addChild(final_attack);
-         
+        LeagueTreeBuild();
+        MatchTreeBuild();
         //TODO:架构完成之后编写log文件
         ROS_INFO("add_Tree Complete");
         decision_thread = std::thread(&decision_node::ExecuteLoop,this);
-        
         decision_thread_running_ = true;
     }
 
@@ -71,6 +41,18 @@ namespace decision_tree
             }
             loop_rate.sleep();
         }
+    }
+
+    //联盟赛行为树搭建
+    void decision_node::LeagueTreeBuild()
+    {
+        
+    }
+
+    //对抗赛行为树搭建
+    void decision_node::MatchTreeBuild()
+    {
+
     }
 }
 

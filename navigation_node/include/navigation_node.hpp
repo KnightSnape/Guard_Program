@@ -20,6 +20,10 @@
 #include<tf2_ros/transform_broadcaster.h>
 #include"mapping_2d_tf_solver.hpp"
 #include"pointcloud_2d_solver.hpp"
+#include"parameter.h"
+
+namespace navigation
+{
 
 class Navigation_Solver
 {
@@ -31,9 +35,10 @@ class Navigation_Solver
             is_path_received = false;
             is_point_cloud2_received = false;
 
-            point_cloud_2d_solver = std::make_shared<PointCloud_2d_Solver>();
-
             std::string config_path = ros::package::getPath("navigation_node") + "/config/config.yaml";
+            read_param(config_path);
+
+            point_cloud_2d_solver = std::make_shared<PointCloud_2d_Solver>();
             YAML::Node Config = YAML::LoadFile(config_path);
 
             int is_2d_solver = Config["is_2d_solver"].as<int>();
@@ -42,7 +47,7 @@ class Navigation_Solver
             PointCloud2_sub = nh.subscribe("/cloud_registered",100000,&Navigation_Solver::PointCloud_Callback,this);
 
             Odometry_pub = nh.advertise<nav_msgs::Odometry>("/Odometry_2d",80000);
-            //LaserScan_pub = nh.advertise<sensor_msgs::LaserScan>("/LaserScan",80000);
+            down_sample_PointCloud2_pub = nh.advertise<sensor_msgs::PointCloud2>("/checker_pointcloud2",80000);
             Initial_Pos = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/initialpose",80000);
             grid_pub = nh.advertise<nav_msgs::OccupancyGrid>("/grid_map",80000);
 
@@ -63,6 +68,7 @@ class Navigation_Solver
         ros::Subscriber PointCloud2_sub;
 
         ros::Publisher Odometry_pub;
+        ros::Publisher down_sample_PointCloud2_pub;
         ros::Publisher LaserScan_pub;
         ros::Publisher Initial_Pos;
         ros::Publisher grid_pub;
@@ -131,9 +137,14 @@ class Navigation_Solver
                 {
                     point_cloud_2d_solver->get_pointcloud(point_cloud2);
                     nav_msgs::OccupancyGrid grid_msg = point_cloud_2d_solver->PointCloud2ToGrid();
+                    sensor_msgs::PointCloud2 down_sample_PointCloud2_msg = point_cloud_2d_solver->get_downsampled_pointcloud2();
                     grid_msg.header.stamp = ros::Time::now();
                     grid_msg.header.frame_id = "camera_init";
                     grid_pub.publish(grid_msg);
+                    down_sample_PointCloud2_msg.header.stamp = ros::Time::now();
+                    down_sample_PointCloud2_msg.header.frame_id = "camera_init";
+                    down_sample_PointCloud2_pub.publish(down_sample_PointCloud2_msg);
+
                 }
                 is_point_cloud2_received = false;
                 if(is_odometry_received)
@@ -172,3 +183,6 @@ class Navigation_Solver
         }
         ros::NodeHandle nh;
 };
+
+}
+

@@ -2,6 +2,9 @@
 #include<chrono>
 #include<geometry_msgs/TransformStamped.h>
 
+namespace navigation
+{
+
 class TF
 {
     public:
@@ -43,3 +46,6 @@ class TF
     private:
 
 };
+
+}
+

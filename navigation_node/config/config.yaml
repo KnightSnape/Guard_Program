@@ -1,1 +1,10 @@
 is_2d_solver: 1
+global_max_z: 0       #这两个参数是调整栅格地图的Z轴直通滤波的范围
+global_min_z: 35
+current_max_z: 1       #这两个参数是调整栅格地图的Z轴直通滤波的范围
+current_min_z: 0
+
+global_map_resolution: 1
+current_map_resolution: 0.1
+
+pcd_name: "cloud_test.pcd"

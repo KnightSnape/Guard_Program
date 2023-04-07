@@ -42,6 +42,11 @@ add_message_files(
   ImageTransmitter.msg
   AutoAIM.msg
   PID.msg
+  DualLoopPID.msg
+  DualLoopPIDWithFilter.msg
+  InteractiveDataRecv.msg
+  InteractiveDataSend.msg
+  PIDWithFilter.msg
 )
 
 add_service_files(

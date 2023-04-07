@@ -1,12 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(armor_decision)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+set(ngraph_DIR "/opt/intel/openvino_2022/runtime/cmake")
+set(InferenceEngine_DIR "/opt/intel/openvino_2022/runtime/cmake")
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   geometry_msgs
@@ -18,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
 )
 
+find_package(ngraph REQUIRED)
+find_package(InferenceEngine REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -27,6 +26,7 @@ include_directories(
   include
   include/behavior
   include/executor
+  include/utility
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_LIBRARY_DIRS}
   ${EIGEN3_INCLUDE_DIR}
@@ -38,14 +38,13 @@ add_executable(
   armor_decision
   src/decision.cpp
   src/decision_tree.cpp
-  src/decision.hpp
-  include/decision_tree.h
-  include/blackboard.hpp
-  include/Timer.h
+  include/utility/point_graph.cpp
 )
 
 target_link_libraries(
   armor_decision
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
+  ${InferenceEngine_LIBRARIES}
+  ${ngraph_LIBRARIES}
 )

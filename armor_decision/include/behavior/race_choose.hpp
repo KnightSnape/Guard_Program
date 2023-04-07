@@ -1,8 +1,10 @@
 #pragma once 
 #include"decision_tree.h"
 #include"chassis_executor.hpp"
+#include"gimbal_executor.hpp"
 #include"log_executor.hpp"
 #include"warn_executor.hpp"
+#include"gimbal_executor.hpp"
 
 namespace decision_tree
 {
@@ -13,9 +15,10 @@ namespace decision_tree
                         int level,
                         const Blackboard::Ptr &blackboard,
                         const Chassis_executor::Ptr &chassis_executor,
+                        const Gimbal_executor::Ptr &gimbal_executor,
                         const Log_executor::Ptr &log_executor,
                         const Warn_executor::Ptr &warn_executor):
-                        SelectorNode::SelectorNode(name,level,blackboard,chassis_executor,log_executor,warn_executor){}
+                        SelectorNode::SelectorNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,warn_executor){}
 
             BehaviorState Update()
             {
