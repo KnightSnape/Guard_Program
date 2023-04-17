@@ -17,6 +17,8 @@ class TF
             geometry_msgs::TransformStamped transform;
             transform.header.frame_id = "map";
             transform.child_frame_id = "camera_init";
+
+            Eigen::Vector3d rotate;
             transform.transform.translation.x = 0;
             transform.transform.translation.y = 0;
             transform.transform.translation.z = 0;

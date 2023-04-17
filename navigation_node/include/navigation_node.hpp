@@ -15,6 +15,7 @@
 #include<thread>
 #include<mutex>
 #include<yaml-cpp/yaml.h>
+#include<Eigen/Eigen>
 #include<ros/package.h>
 #include<tf2/LinearMath/Quaternion.h>
 #include<tf2_ros/transform_broadcaster.h>
@@ -47,7 +48,7 @@ class Navigation_Solver
             PointCloud2_sub = nh.subscribe("/cloud_registered",100000,&Navigation_Solver::PointCloud_Callback,this);
 
             Odometry_pub = nh.advertise<nav_msgs::Odometry>("/Odometry_2d",80000);
-            down_sample_PointCloud2_pub = nh.advertise<sensor_msgs::PointCloud2>("/checker_pointcloud2",80000);
+            PointCloud2_pub = nh.advertise<sensor_msgs::PointCloud2>("/checker_pointcloud2",80000);
             Initial_Pos = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("/initialpose",80000);
             grid_pub = nh.advertise<nav_msgs::OccupancyGrid>("/grid_map",80000);
 
@@ -68,7 +69,7 @@ class Navigation_Solver
         ros::Subscriber PointCloud2_sub;
 
         ros::Publisher Odometry_pub;
-        ros::Publisher down_sample_PointCloud2_pub;
+        ros::Publisher PointCloud2_pub;
         ros::Publisher LaserScan_pub;
         ros::Publisher Initial_Pos;
         ros::Publisher grid_pub;
@@ -104,8 +105,20 @@ class Navigation_Solver
             odometry_lidar.pose.pose.orientation = msg->pose.pose.orientation;
             odometry_lidar.twist.twist.linear.x = msg->twist.twist.linear.x;
             odometry_lidar.twist.twist.linear.y = msg->twist.twist.linear.y;
-            odometry_lidar.twist.twist.linear.z = 0;
+            odometry_lidar.twist.twist.linear.z = msg->twist.twist.linear.z;
             odometry_lidar.twist.twist.angular = msg->twist.twist.angular;
+
+            Eigen::Vector3d pos,new_pos;
+            pos.x() = msg->pose.pose.position.x;
+            pos.y() = msg->pose.pose.position.y;
+            pos.z() = msg->pose.pose.position.z;
+            Eigen::AngleAxisd rotation_vector1 (-37.0 / 180 * M_PI, Eigen::Vector3d(1, 0, 0)); 
+            Eigen::Matrix3d rotation_matrix1 = Eigen::Matrix3d::Identity();
+            rotation_matrix1 = rotation_vector1.matrix();
+            new_pos = rotation_matrix1 * pos;
+            odometry_lidar.pose.pose.position.x = new_pos.x();
+            odometry_lidar.pose.pose.position.y = new_pos.y();
+            odometry_lidar.pose.pose.position.z = new_pos.z();
             odometry_lidar_mutex.unlock();
         }
 
@@ -133,19 +146,6 @@ class Navigation_Solver
         {
             while(1)
             {
-                if(is_point_cloud2_received)
-                {
-                    point_cloud_2d_solver->get_pointcloud(point_cloud2);
-                    nav_msgs::OccupancyGrid grid_msg = point_cloud_2d_solver->PointCloud2ToGrid();
-                    sensor_msgs::PointCloud2 down_sample_PointCloud2_msg = point_cloud_2d_solver->get_downsampled_pointcloud2();
-                    grid_msg.header.stamp = ros::Time::now();
-                    grid_msg.header.frame_id = "camera_init";
-                    grid_pub.publish(grid_msg);
-                    down_sample_PointCloud2_msg.header.stamp = ros::Time::now();
-                    down_sample_PointCloud2_msg.header.frame_id = "camera_init";
-                    down_sample_PointCloud2_pub.publish(down_sample_PointCloud2_msg);
-
-                }
                 is_point_cloud2_received = false;
                 if(is_odometry_received)
                 {
@@ -153,6 +153,13 @@ class Navigation_Solver
                     odometry_lidar.header.frame_id = "camera_init";
                     Odometry_pub.publish(odometry_lidar);
                 }
+                if(is_point_cloud2_received)
+                {
+                    point_cloud2.header.stamp = ros::Time::now();
+                    point_cloud2.header.frame_id = "camera_init";
+                    PointCloud2_pub.publish(point_cloud2);
+                }
+                is_point_cloud2_received = false;
                 is_odometry_received = false;
                 geometry_msgs::TransformStamped stamped = tf_2dmap.mapping_TF_solver();
                 geometry_msgs::TransformStamped stamped_base = tf_2dmap.base_link_TF_solver();

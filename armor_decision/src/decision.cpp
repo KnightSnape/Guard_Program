@@ -18,8 +18,6 @@ namespace decision_tree
         //根节点需要用时间的Selector
         root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,warm_exe_);
         //选择联盟赛行为树还是对抗赛行为树
-
-        LeagueTreeBuild();
         MatchTreeBuild();
         //TODO:架构完成之后编写log文件
         ROS_INFO("add_Tree Complete");
@@ -41,12 +39,6 @@ namespace decision_tree
             }
             loop_rate.sleep();
         }
-    }
-
-    //联盟赛行为树搭建
-    void decision_node::LeagueTreeBuild()
-    {
-        
     }
 
     //对抗赛行为树搭建
