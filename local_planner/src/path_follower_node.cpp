@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 
   ros::Publisher pubSpeed = nh.advertise<geometry_msgs::TwistStamped> ("/cmd_vel", 5);
   geometry_msgs::TwistStamped cmd_vel;
-  cmd_vel.header.frame_id = "/vehicle";
+  cmd_vel.header.frame_id = "camera_init";
 
   if (autonomyMode) {
     joySpeed = autonomySpeed / maxSpeed;

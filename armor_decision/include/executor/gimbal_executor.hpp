@@ -2,8 +2,10 @@
 #include<chrono>
 #include<iostream>
 #include<ros/package.h>
+#include"log_executor.hpp"
 #include<fstream>
 #include<sstream>
+
 
 class Gimbal_executor
 {
