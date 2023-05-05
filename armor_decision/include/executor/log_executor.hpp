@@ -8,6 +8,7 @@
 #include<sstream>
 #include<time.h>
 #include<string.h>
+#include<yaml-cpp/yaml.h>
 
 class Log_executor
 {

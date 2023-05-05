@@ -57,6 +57,9 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>rospack</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>roslaunch</build_depend>
   <build_export_depend>cv_bridge</build_export_depend>
   <build_export_depend>geometry_msgs</build_export_depend>
   <build_export_depend>nav_msgs</build_export_depend>
@@ -65,6 +68,9 @@
   <build_export_depend>sensor_msgs</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>tf</build_export_depend>
+  <build_export_depend>rospack</build_export_depend>
+  <build_export_depend>roslib</build_export_depend>
+  <build_export_depend>roslaunch</build_export_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>nav_msgs</exec_depend>
@@ -73,6 +79,9 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>tf</exec_depend>
+  <exec_depend>rospack</exec_depend>
+  <exec_depend>roslib</exec_depend>
+  <exec_depend>roslaunch</exec_depend>
 
 
 

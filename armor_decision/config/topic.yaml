@@ -1,0 +1,24 @@
+Subscribe:
+  pitch_now_topic: /gimbal_pitch_pid/pid
+  yaw_now_topic: /gimbal_yaw_pid/pid
+  auto_aim_sub_topic: /autoaim/target
+  robot_hp_sub_topic: /referee/robot_hp
+  bullet_remain_sub_topic: /referee/bullet_remaining
+  game_state_sub_topic: /referee/game_status
+  game_result_sub_topic: /referee/game_result
+  robot_buff_sub_topic: /referee/robot_buff
+  robot_position_sub_topic: /referee/robot_position
+  robot_status_sub_topic: /referee/robot_status
+  client_command_sub_topic: /referee/client_command
+  client_receive_sub_topic: /567
+  vision_mode_switch_topic: /vision/service
+  odometry_topic: /Odometry
+
+Advertise:
+  navigation_target_topic: /way_point
+  joy_topic: /joy
+  cmd_twist_topic: /cmd_vel
+  use_navigation_topic: /use_navigation
+  autoaim_state_topic: /autoaim/status
+  pitch_set_topic: /gimbal_pitch_set
+  yaw_set_topic: /gimbal_yaw_set

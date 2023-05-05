@@ -1,0 +1,18 @@
+#0:INITIAL
+#1:STANDBY(1)
+#2:TWO POINTS(6 and 1)
+#3:ATTACK_MODE(1,6,7,10)
+#4:MULTI_TASK(1,2,3,5,6,10,7,18)
+#5:NETWORK
+mode: 0
+
+max_command_control_remain_time: 5.0
+max_shoot_control_remain_time: 5.0
+max_standby_control_remain_time: 5.0 
+max_autoaim_control_remain_time: 5.0
+
+pitch_upper_threshold: 12.0
+pitch_lower_threshold: -5.0
+yaw_work_speed: 5.1213
+pitch_rotate_speed: 1.12
+rotate_freq: 100.0

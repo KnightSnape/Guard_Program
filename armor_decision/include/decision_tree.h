@@ -9,7 +9,7 @@
 #include<string>
 #include"executor/chassis_executor.hpp"
 #include"executor/log_executor.hpp"
-#include"executor/warn_executor.hpp"
+#include"executor/autoaim_executor.hpp"
 #include"executor/gimbal_executor.hpp"
 #include"utility/blackboard.hpp"
 using namespace std;
@@ -31,14 +31,14 @@ namespace decision_tree
                 const Chassis_executor::Ptr &chassis_executor,
                 const Gimbal_executor::Ptr &gimbal_executor,
                 const Log_executor::Ptr &log_executor,
-                const Warn_executor::Ptr &warn_executor):
+                const AutoAim_executor::Ptr &autoaim_executor):
                 name_(name),
                 level_(level),
                 blackboard_ptr_(blackboard),
                 chassis_exe_ptr_(chassis_executor),
                 gimbal_exe_ptr_(gimbal_executor),
                 log_exe_ptr_(log_executor),
-                warn_exe_ptr_(warn_executor)
+                autoaim_exe_ptr_(autoaim_executor)
             {}
             virtual ~TreeNode() = default;
             virtual BehaviorState Update() = 0;
@@ -53,7 +53,7 @@ namespace decision_tree
             Chassis_executor::Ptr chassis_exe_ptr_;
             Gimbal_executor::Ptr gimbal_exe_ptr_;
             Log_executor::Ptr log_exe_ptr_;
-            Warn_executor::Ptr warn_exe_ptr_;
+            AutoAim_executor::Ptr autoaim_exe_ptr_;
             int level_;
             string name_;
             BehaviorState behavior_state_;
@@ -70,8 +70,8 @@ namespace decision_tree
                         const Chassis_executor::Ptr &chassis_executor,
                         const Gimbal_executor::Ptr &gimbal_executor,
                         const Log_executor::Ptr &log_executor,
-                        const Warn_executor::Ptr &warn_executor):
-                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,warn_executor){}
+                        const AutoAim_executor::Ptr &autoaim_executor):
+                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,autoaim_executor){}
             virtual ~SequenceNode() = default;
             //运行一次函数增加一个孩子
             void addChild(TreeNode* child_node_ptr)
@@ -128,8 +128,8 @@ namespace decision_tree
                         const Chassis_executor::Ptr &chassis_executor,
                         const Gimbal_executor::Ptr &gimbal_executor,
                         const Log_executor::Ptr &log_executor,
-                        const Warn_executor::Ptr &warn_executor):
-                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,warn_executor){}
+                        const AutoAim_executor::Ptr &autoaim_executor):
+                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,autoaim_executor){}
             virtual ~SelectorNode() = default;
             void addChild(TreeNode* child_node_ptr)
             {
@@ -186,8 +186,8 @@ namespace decision_tree
                         const Chassis_executor::Ptr &chassis_executor,
                         const Gimbal_executor::Ptr &gimbal_executor,
                         const Log_executor::Ptr &log_executor,
-                        const Warn_executor::Ptr &warn_executor):
-                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,warn_executor){}
+                        const AutoAim_executor::Ptr &autoaim_executor):
+                        TreeNode::TreeNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,autoaim_executor){}
             virtual ~ActionNode() = default;
             void print()
             {

@@ -7,7 +7,7 @@
 #include"utility/blackboard.hpp"
 
 #include"log_executor.hpp"
-#include"warn_executor.hpp"
+#include"autoaim_executor.hpp"
 #include"chassis_executor.hpp"
 #include"gimbal_executor.hpp"
 
@@ -31,8 +31,6 @@ namespace decision_tree
             }
             void ExecuteLoop();
             void visualize();
-            void LeagueTreeBuild();
-            void MatchTreeBuild();
         private:
             Race_Choose* root_node;
             SequenceNode* League_node;
@@ -41,7 +39,7 @@ namespace decision_tree
             Chassis_executor::Ptr chassis_exe_;
             Gimbal_executor::Ptr gimbal_exe_;
             Log_executor::Ptr log_exe_;
-            Warn_executor::Ptr warm_exe_;
+            AutoAim_executor::Ptr autoaim_exe_;
             cv::Mat map_;
             bool visualize_flag_;
             std::thread decision_thread;

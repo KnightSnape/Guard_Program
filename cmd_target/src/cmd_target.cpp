@@ -18,7 +18,6 @@ void cmd_solver::odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
 //假定一个循环
 void cmd_solver::main_process()
 {
-
     sensor_msgs::Joy joy;
     joy.axes.push_back(0);
     joy.axes.push_back(0);

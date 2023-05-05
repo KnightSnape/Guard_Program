@@ -8,6 +8,5 @@ namespace decision_tree
     {
         public:
             
-        
     };
 }

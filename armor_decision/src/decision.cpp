@@ -13,12 +13,14 @@ namespace decision_tree
         chassis_exe_ = std::make_shared<Chassis_executor>();
         gimbal_exe_ = std::make_shared<Gimbal_executor>();
         log_exe_ = std::make_shared<Log_executor>();
-        warm_exe_ = std::make_shared<Warn_executor>();
+        autoaim_exe_ = std::make_shared<AutoAim_executor>();
+
+        chassis_exe_->initParam(nh);
 
         //根节点需要用时间的Selector
-        root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,warm_exe_);
-        //选择联盟赛行为树还是对抗赛行为树
-        MatchTreeBuild();
+        root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        
+
         //TODO:架构完成之后编写log文件
         ROS_INFO("add_Tree Complete");
         decision_thread = std::thread(&decision_node::ExecuteLoop,this);
@@ -41,11 +43,6 @@ namespace decision_tree
         }
     }
 
-    //对抗赛行为树搭建
-    void decision_node::MatchTreeBuild()
-    {
-
-    }
 }
 
 int main(int argc,char **argv)
