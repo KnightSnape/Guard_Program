@@ -5,7 +5,7 @@ namespace decision_tree
     decision_node::decision_node()
     {
         ros::NodeHandle nh;
-
+        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
         loop_rate_ = 5;//10Hz or 30Hz, 控制处理频率
 
         //导入新地图
@@ -20,7 +20,6 @@ namespace decision_tree
         //根节点需要用时间的Selector
         root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
         
-
         //TODO:架构完成之后编写log文件
         ROS_INFO("add_Tree Complete");
         decision_thread = std::thread(&decision_node::ExecuteLoop,this);

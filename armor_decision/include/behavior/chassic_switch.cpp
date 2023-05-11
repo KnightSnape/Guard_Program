@@ -25,6 +25,7 @@ BehaviorState Chassis_Switch::Update()
             //如果是正在导航模式，即刻停止
             if(blackboard_ptr_->chassis_mode == Chassis_Mode::NAVIGATING)
             {
+                ROS_DEBUG("Receive CMD,stop navigating");
                 chassis_exe_ptr_->pub_stop_signal();
             }
             blackboard_ptr_->chassis_mode = Chassis_Mode::LISTEN_CAPTAIN;
@@ -42,6 +43,7 @@ BehaviorState Chassis_Switch::Update()
         //如果已经到达目标，使用STANDBY模式停留
         if(target_state == 1)
         {
+            ROS_DEBUG("On Target");
             chassis_exe_ptr_->pub_stop_signal();
             blackboard_ptr_->standBy_control.is_standby = true;
             blackboard_ptr_->standBy_control.remain_control_time = blackboard_ptr_->standBy_control.max_control_time;
@@ -49,6 +51,7 @@ BehaviorState Chassis_Switch::Update()
         }
         else if(target_state == 2)
         {
+            ROS_DEBUG("GOTO Next Target");
             cv::Point target_point = blackboard_ptr_->graph.get_node_point(blackboard_ptr_->next_target_id);
             Eigen::Vector2i target_point_eigen{target_point.x,target_point.y};
             if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
@@ -76,6 +79,7 @@ BehaviorState Chassis_Switch::Update()
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT) || 
             (blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING))
             {
+                ROS_DEBUG("Switch to captain control mode");
                 blackboard_ptr_->chassis_mode = Chassis_Mode::CAPTAIN_CONTROL;
                 blackboard_ptr_->command_control.is_control = true;
                 blackboard_ptr_->command_control.remain_control_time = blackboard_ptr_->command_control.max_control_time;
@@ -112,6 +116,10 @@ BehaviorState Chassis_Switch::Update()
             }
             blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
         }
+        if(blackboard_ptr_->command_mode == CMD_Command::REPOS)
+        {
+            //TODO(Knight):Add method
+        }
         return BehaviorState::SUCCESS;
     }
     //云台手控制模式
@@ -121,23 +129,27 @@ BehaviorState Chassis_Switch::Update()
         //直接控制方向移动
         if(blackboard_ptr_->command_mode == CMD_Command::MOVE_UP)
         {
+            ROS_DEBUG("start control up");
             blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                        2,twist_yaw_angle);
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN)
         {
+            ROS_DEBUG("start control down");
             blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         4,twist_yaw_angle);
 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT)
         {
+            ROS_DEBUG("start control left");
             blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         3,twist_yaw_angle);
 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT)
         {
+            ROS_DEBUG("start control right");
             blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         1,twist_yaw_angle);
             
@@ -158,6 +170,7 @@ BehaviorState Chassis_Switch::Update()
         blackboard_ptr_->command_control.remain_control_time = blackboard_ptr_->command_control.remain_control_time - blackboard_ptr_->average_time;
         if(blackboard_ptr_->command_control.remain_control_time <= 0)
         {
+            ROS_DEBUG("Captain Control Done");
             blackboard_ptr_->command_control.remain_control_time = 0.0;
             blackboard_ptr_->command_control.is_control = false;
             //立即进入自由位置判断
@@ -172,6 +185,7 @@ BehaviorState Chassis_Switch::Update()
         blackboard_ptr_->standBy_control.remain_control_time = blackboard_ptr_->standBy_control.remain_control_time - blackboard_ptr_->average_time;
         if(blackboard_ptr_->standBy_control.remain_control_time <= 0)
         {
+            ROS_DEBUG("StandBy over");
             blackboard_ptr_->standBy_control.remain_control_time = 0.0;
             blackboard_ptr_->standBy_control.is_standby = false;
             //再次进入自由决策模式
@@ -186,6 +200,7 @@ BehaviorState Chassis_Switch::Update()
         //如果你的decision目标就是原地，可以保持不动，使用STANDBY模式
         if(blackboard_ptr_->now_id == blackboard_ptr_->navigation_target_id)
         {
+            ROS_DEBUG("don't go anywhere");
             blackboard_ptr_->standBy_control.is_standby = true;
             blackboard_ptr_->standBy_control.remain_control_time = blackboard_ptr_->standBy_control.max_control_time;
             blackboard_ptr_->chassis_mode = Chassis_Mode::STANDBY;
@@ -212,7 +227,6 @@ BehaviorState Chassis_Switch::Update()
             ROS_DEBUG("navigation start");
             blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
         }
-
         return BehaviorState::SUCCESS;
     }
 }

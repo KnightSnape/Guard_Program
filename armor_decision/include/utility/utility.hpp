@@ -1,5 +1,4 @@
 #pragma once
-#include<ros/ros.h>
 #include<Eigen/Eigen>
 #include<opencv2/opencv.hpp>
 #include<opencv2/core/eigen.hpp>
@@ -8,7 +7,11 @@
 #include<iostream>
 #include<unordered_map>
 #include<yaml-cpp/yaml.h>
+#include<ros/ros.h>
 #include<ros/package.h>
+#include<ros/network.h>
+#include<ros/xmlrpc_manager.h>
+#include"xmlrpcpp/XmlRpc.h"
 #include"std_msgs/Float64.h"
 #include"nav_msgs/Odometry.h"
 #include"gary_msgs/AutoAIM.h"

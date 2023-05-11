@@ -61,10 +61,8 @@ void FreeInference::main_process(int &target,Gimbal_Mode& gimbal_mode,AutoAim_Mo
         autoaim_mode = AutoAim_Mode::NORMAL;
         return;
     }
-    
+    //TODO(Knight):Finish Third,Fourth Method
 }
-
-
 
 }
 

@@ -51,6 +51,7 @@ add_executable(
   include/executor/autoaim_executor.cpp
   include/executor/chassis_executor.cpp
   include/executor/gimbal_executor.cpp
+  include/utility/node_manager.cpp
   include/utility/point_graph.cpp
   include/utility/pos_manager.cpp
   include/utility/blackboard.cpp

@@ -8,9 +8,9 @@
 #include<opencv2/opencv.hpp>
 #include<Eigen/Eigen>
 #include"Inference/freeInference.hpp"
+#include"utility/node_manager.hpp"
 #include"utility/point_graph.hpp"
 #include"utility/pos_manager.hpp"
-#include"utility/utility.hpp"
 using namespace std;
 using namespace cv;
 
@@ -91,6 +91,8 @@ namespace decision_tree
             FreeInference inference;
             //位置管理器
             Pos_Manager pos_manager;
+            //Node管理器
+            ROSNodeManager ros_node_manager;
             //当前所在ID
             int now_id;
             //导航所需要的目标
