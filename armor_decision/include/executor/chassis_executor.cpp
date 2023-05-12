@@ -1,6 +1,6 @@
 #include"chassis_executor.hpp"
 
-void Chassis_executor::initParam(ros::NodeHandle& nh_)
+Chassis_executor::Chassis_executor()
 {
     std::string topic_path = ros::package::getPath("armor_decision") + "/config/topic.yaml";
     YAML::Node Config = YAML::LoadFile(topic_path);

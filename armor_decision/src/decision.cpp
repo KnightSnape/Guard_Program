@@ -5,7 +5,7 @@ namespace decision_tree
     decision_node::decision_node()
     {
         ros::NodeHandle nh;
-        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
         loop_rate_ = 5;//10Hz or 30Hz, 控制处理频率
 
         //导入新地图
@@ -15,10 +15,20 @@ namespace decision_tree
         log_exe_ = std::make_shared<Log_executor>();
         autoaim_exe_ = std::make_shared<AutoAim_executor>();
 
-        chassis_exe_->initParam(nh);
+        autoaim_exe_->initParam(nh);
 
         //根节点需要用时间的Selector
-        root_node = new Race_Choose("robot_decision",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        root_node = new SequenceNode("root_node",0,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        
+        GameStart* start = new GameStart("start",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        Chassis_Switch* chassis_node = new Chassis_Switch("chassis",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        Gimbal_Switch* gimbal_node = new Gimbal_Switch("gimbal",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+        AutoAim_Switch* autoaim_node = new AutoAim_Switch("autoaim",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
+
+        root_node->addChild(chassis_node);
+        root_node->addChild(start);
+        root_node->addChild(gimbal_node);
+        root_node->addChild(autoaim_node);
         
         //TODO:架构完成之后编写log文件
         ROS_INFO("add_Tree Complete");

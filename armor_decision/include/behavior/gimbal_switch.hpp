@@ -10,6 +10,7 @@ namespace decision_tree
     
     class Gimbal_Switch : public ActionNode
     {
+        public:
         Gimbal_Switch(std::string name,
             int level,
             const Blackboard::Ptr &blackboard,

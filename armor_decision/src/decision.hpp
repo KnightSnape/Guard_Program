@@ -13,6 +13,9 @@
 
 #include"race_choose.hpp"
 #include"game_start.hpp"
+#include"chassic_switch.hpp"
+#include"gimbal_switch.hpp"
+#include"autoaim_switch.hpp"
 
 namespace decision_tree
 {
@@ -32,7 +35,7 @@ namespace decision_tree
             void ExecuteLoop();
             void visualize();
         private:
-            Race_Choose* root_node;
+            SequenceNode* root_node;
             SequenceNode* League_node;
             SequenceNode* Match_node;
             Blackboard::Ptr blackboard_;

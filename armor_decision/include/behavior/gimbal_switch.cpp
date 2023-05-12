@@ -14,28 +14,35 @@ Gimbal_Switch::Gimbal_Switch(std::string name,
 
 BehaviorState Gimbal_Switch::Update()
 {
-    if(blackboard_ptr_->is_auto_aim_received)
+    ROS_DEBUG("Start Gimbal Node");
+    if(blackboard_ptr_->is_auto_aim_received && blackboard_ptr_->auto_aim_msg.target_id != 0)
     {
         blackboard_ptr_->gimbal_mode = Gimbal_Mode::FOLLOW_AUTOAIM;
+        ROS_DEBUG("Get Gimbal AutoAim State");
     }
     if(blackboard_ptr_->is_client_command_received)
     {
         blackboard_ptr_->gimbal_mode = Gimbal_Mode::WARN_CAPTAIN;
+        ROS_DEBUG("Get Gimbal Captain State");
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::WARN_CAPTAIN)
     {
+        ROS_DEBUG("Listening Captain");
         gimbal_exe_ptr_->operate_state(1);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::LOW_SPEED)
     {   
+        ROS_DEBUG("Start LOW_SPEED");
         gimbal_exe_ptr_->operate_state(2);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::HIGH_SPEED)
     {
+        ROS_DEBUG("Start HIGH_SPEED");
         gimbal_exe_ptr_->operate_state(3);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::SCANNING)
     {
+        ROS_DEBUG("Start Scanning");
         gimbal_exe_ptr_->operate_state(4);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::FOLLOW_AUTOAIM)
@@ -47,6 +54,7 @@ BehaviorState Gimbal_Switch::Update()
             return BehaviorState::SUCCESS;
         }
     }
+    return BehaviorState::SUCCESS;
 
 }
 

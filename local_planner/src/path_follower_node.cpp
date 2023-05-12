@@ -10,6 +10,7 @@
 
 #include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -90,6 +91,8 @@ int pathPointID = 0;
 bool pathInit = false;
 bool navFwd = true;
 double switchTime = 0;
+
+bool stop_signal = false;
 
 nav_msgs::Path path;
 
@@ -178,6 +181,11 @@ void stopHandler(const std_msgs::Int8::ConstPtr& stop)
   safetyStop = stop->data;
 }
 
+void stopsignalcallback(const std_msgs::Bool::ConstPtr& msg)
+{
+  stop_signal = msg->data;
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "path_follower");
@@ -222,6 +230,8 @@ int main(int argc, char** argv)
   ros::Subscriber subSpeed = nh.subscribe<std_msgs::Float32> ("/speed", 5, speedHandler);
 
   ros::Subscriber subStop = nh.subscribe<std_msgs::Int8> ("/stop", 5, stopHandler);
+
+  ros::Subscriber subStopSignal = nh.subscribe<std_msgs::Bool>("//use_navigation",1,stopsignalcallback);
 
   ros::Publisher pubSpeed = nh.advertise<geometry_msgs::TwistStamped> ("/cmd_vel", 5);
   geometry_msgs::TwistStamped cmd_vel;
@@ -335,6 +345,7 @@ int main(int argc, char** argv)
         if (fabs(vehicleSpeed) <= maxAccel / 100.0) cmd_vel.twist.linear.x = 0;
         else cmd_vel.twist.linear.x = vehicleSpeed;
         cmd_vel.twist.angular.z = vehicleYawRate;
+        if(stop_signal)
         pubSpeed.publish(cmd_vel);
 
         pubSkipCount = pubSkipNum;

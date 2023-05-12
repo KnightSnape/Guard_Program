@@ -20,4 +20,8 @@ void AutoAim_executor::pub_autoaim_state(int state,int target_id)
 
     status_msg.header.frame_id = "camera_init";
     status_msg.header.stamp = ros::Time::now();
+
+    status_publisher.publish(status_msg);
+    ROS_DEBUG("publish autoaim_state done");
+
 }

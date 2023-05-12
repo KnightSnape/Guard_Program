@@ -13,11 +13,12 @@ class Chassis_executor
 {
     public:
         typedef std::shared_ptr<Chassis_executor> Ptr;
-        void initParam(ros::NodeHandle& nh_);
+        Chassis_executor();
         void pub_nav_point(geometry_msgs::PointStamped msg);
         void pub_twist(geometry_msgs::TwistStamped msg);
         void pub_stop_signal();
 
+        ros::NodeHandle nh_;
         Log_executor::Ptr log_exe_ptr_;
         std::stringstream str;
         ros::Publisher use_navigation_pub;

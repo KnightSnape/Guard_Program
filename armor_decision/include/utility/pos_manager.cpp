@@ -25,9 +25,10 @@ Eigen::Vector2i Pos_Manager::world_to_map(const Eigen::Vector3d &pw)
 
 Eigen::Vector3d Pos_Manager::map_to_world(const Eigen::Vector2i &pm)
 {
+    //TODO(Knight):update transform
     Eigen::Vector3d world_pos;
     world_pos.x() = (pm.x() - pos_x_zero) / 840.0 * 28;
-    world_pos.y() = 15.0 - ((pm.y() - pos_y_zero) / 450.0 * 15);
+    world_pos.y() = ((pm.y() - pos_y_zero) / 450.0 * 15);
     world_pos.z() = 0.0;
     return world_pos;
 }

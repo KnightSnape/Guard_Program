@@ -14,7 +14,6 @@ Chassis_Switch::Chassis_Switch(std::string name,
 
 BehaviorState Chassis_Switch::Update()
 {
-
     cv::Point sentry_point = cv::Point(blackboard_ptr_->sentry_map_point.x(),blackboard_ptr_->sentry_map_point.y());
     //已经接收到了云台手指令
     if(blackboard_ptr_->is_client_command_received)
@@ -34,12 +33,13 @@ BehaviorState Chassis_Switch::Update()
     //正在导航状态 
     if(blackboard_ptr_->chassis_mode == Chassis_Mode::NAVIGATING)
     {
+        ROS_DEBUG("Is navigating");
         //导航如果已经到达就可以切成STANDBY模式，使其停留或者小陀螺一段时间，如果到达一个局部目标，使用局部模式
         int target_state;
         //更新一轮
         blackboard_ptr_->graph.updatePoint(sentry_point,blackboard_ptr_->now_id,blackboard_ptr_->navigation_target_id,
                                             target_state,blackboard_ptr_->next_target_id);
-        
+        ROS_DEBUG("You are in id: %d,on point:(%d,%d)",blackboard_ptr_->now_id,sentry_point.x,sentry_point.y);
         //如果已经到达目标，使用STANDBY模式停留
         if(target_state == 1)
         {
@@ -222,6 +222,9 @@ BehaviorState Chassis_Switch::Update()
             if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
             target_point_eigen = blackboard_ptr_->pos_manager.inverse_point(target_point_eigen);
             Eigen::Vector3d target_pos_world = blackboard_ptr_->pos_manager.map_to_world(target_point_eigen);
+            ROS_DEBUG("we are in:(%d,%d)",sentry_point.x,sentry_point.y);   
+            ROS_DEBUG("the target is in:(%d,%d)",target_point_eigen.x(),target_point_eigen.y());
+            ROS_DEBUG("the target 3d point is:(%f,%f,%f)",target_pos_world.x(),target_pos_world.y(),target_pos_world.z());
             geometry_msgs::PointStamped target_pos_msg = blackboard_ptr_->pos_manager.transfer_to_msg(target_pos_world);
             chassis_exe_ptr_->pub_nav_point(target_pos_msg);
             ROS_DEBUG("navigation start");

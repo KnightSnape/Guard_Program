@@ -13,7 +13,7 @@ Race_Choose::Race_Choose(std::string name,
                          const AutoAim_executor::Ptr &autoaim_executor):
                          SelectorNode::SelectorNode(name,level,blackboard,chassis_executor,gimbal_executor,log_executor,autoaim_executor){}
 
-
+//基本废弃
 BehaviorState Race_Choose::Update()
 {
     //RMUL 

@@ -18,7 +18,7 @@ namespace decision_tree
                         const Gimbal_executor::Ptr &gimbal_executor,
                         const Log_executor::Ptr &log_executor,
                         const AutoAim_executor::Ptr &autoaim_executor);
-
+        private:
             BehaviorState Update();
     };
 }

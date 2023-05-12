@@ -56,7 +56,7 @@ void FreeInference::main_process(int &target,Gimbal_Mode& gimbal_mode,AutoAim_Mo
     }
     if(mode == 1)
     {
-        target = 0;
+        target = 5;
         gimbal_mode = Gimbal_Mode::SCANNING;
         autoaim_mode = AutoAim_Mode::NORMAL;
         return;
