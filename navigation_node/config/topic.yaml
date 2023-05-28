@@ -1,0 +1,7 @@
+Subscribe:
+  odomtry: /Odometry
+  navigation: /way_point
+  signal: /use_navigation
+
+Advertise:
+  cmd: /cmd_vel
