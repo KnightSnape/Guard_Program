@@ -1,10 +1,37 @@
-#include"cmd_target.hpp"
+#include"cmd_target_node.h"
 
-int main(int argc,char **argv)
+namespace qt5_solver
 {
-    ros::init(argc,argv,"cmd_target");
-    ros::NodeHandle nh;
-    auto Cmd_solver = std::make_shared<cmd_solver>(nh);
+
+QNode::QNode(int argc,char **argv):
+init_argc(argc),
+init_argv(argv)
+{
+    way_pub = nh.advertise<geometry_msgs::PointStamped>("/way_point",5);
+}
+
+QNode::~QNode()
+{
+    ros::shutdown();
+}
+
+void QNode::run()
+{
     ros::spin();
-    return 0;
+}
+
+void QNode::get_final_navigaton(float X,float Y)
+{
+    msg.header.stamp = ros::Time::now();
+    msg.header.frame_id = "camera_init";
+    msg.point.x = X;
+    msg.point.y = Y;
+    msg.point.z = 0.0;
+    way_pub.publish(msg);
+    ROS_DEBUG("publish done");
+}
+
+
+
+
 }

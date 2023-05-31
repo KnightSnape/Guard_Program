@@ -1,6 +1,0 @@
-<launch>
-
-    <node name="navigation_node" pkg="navigation_node" type="navigation_node" output="screen"/>
-
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find navigation_node)/rviz/navigation_2d.rviz"/>
-</launch>
