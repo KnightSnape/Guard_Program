@@ -237,10 +237,25 @@ void Blackboard::Client_Command_State_Transform()
     {
         command_mode = CMD_Command::MOVE_RIGHT;
     }
+    else if((char)client_command_msg.keyboard_key_pressed == 'Y')
+    {
+        command_mode = CMD_Command::MOVE_UP_ABS;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'H')
+    {
+        command_mode = CMD_Command::MOVE_DOWN_ABS;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'G')
+    {
+        command_mode = CMD_Command::MOVE_LEFT_ABS;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'J')
+    {
+        command_mode = CMD_Command::MOVE_RIGHT_ABS;
+    }
+    
 
 }
-
-
 
 
 }

@@ -112,6 +112,10 @@ enum class CMD_Command
     MOVE_LEFT = 8,//强制向小地图左方移动
     MOVE_RIGHT = 9,//强制向小地图右方移动
     MOVE_TARGET = 10,//向某个方向移动
+    MOVE_UP_ABS = 11,//强制向前
+    MOVE_DOWN_ABS = 12,//强制向后
+    MOVE_LEFT_ABS = 13,//强制向左
+    MOVE_RIGHT_ABS = 14,//强制向右
 };
 
 //底盘状态

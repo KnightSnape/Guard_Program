@@ -77,6 +77,10 @@ BehaviorState Chassis_Switch::Update()
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN) || 
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT) || 
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS) ||
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS) || 
             (blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING))
             {
                 ROS_DEBUG("Switch to captain control mode");
@@ -153,6 +157,30 @@ BehaviorState Chassis_Switch::Update()
             blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         1,twist_yaw_angle);
             
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS)
+        {
+            ROS_DEBUG("start control up abs");
+            blackboard_ptr_->command_control.twist_x = 0.3;
+            blackboard_ptr_->command_control.twist_y = 0;
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS)
+        {
+            ROS_DEBUG("start control down abs");
+            blackboard_ptr_->command_control.twist_x = -0.3;
+            blackboard_ptr_->command_control.twist_y = 0;
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS)
+        {
+            ROS_DEBUG("start control left abs");
+            blackboard_ptr_->command_control.twist_x = 0;
+            blackboard_ptr_->command_control.twist_y = 0.3;
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS)
+        {
+            ROS_DEBUG("start control right abs");
+            blackboard_ptr_->command_control.twist_x = 0;
+            blackboard_ptr_->command_control.twist_y = -0.3;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING)
         {
@@ -242,7 +270,11 @@ bool Chassis_Switch::checkchassic()
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_UP) ||
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_TARGET) ||
                     (blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING) || 
-                    (blackboard_ptr_->command_mode == CMD_Command::REPOS);
+                    (blackboard_ptr_->command_mode == CMD_Command::REPOS) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS);
 
     return check; 
 }
