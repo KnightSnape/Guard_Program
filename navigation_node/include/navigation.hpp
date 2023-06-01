@@ -22,6 +22,8 @@ class navigation
         void cmd_vel_callback(const geometry_msgs::PointStamped::ConstPtr& msg);
         void odom_to_vec3();
         void target_to_vec3();
+        void cal_odom_yaw();
+        void cal_target_yaw();
         void pub_twist(const Eigen::Vector3d& twist_eigen);
         void main_process();
 
@@ -38,8 +40,16 @@ class navigation
         geometry_msgs::PointStamped point;
         Eigen::Vector3d target_point;
         Eigen::Vector3d self_pos;
+        Eigen::Quaterniond self_q;
+        Eigen::Quaterniond final_q;
+
+        double yaw_now;
+        double yaw_target;
+        double final_rotate_yaw;
+
         bool is_navigating;
         bool start_navigation;
+        bool is_just_rotate;
 
         double max_speed;
         double max_length;
