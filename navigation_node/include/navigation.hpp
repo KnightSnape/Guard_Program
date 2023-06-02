@@ -14,12 +14,11 @@
 class navigation
 {
     public:
-        typedef std::shared_ptr<navigation> Ptr;
         navigation();
 
-        void odom_callback(const nav_msgs::Odometry::ConstPtr& msg);
-        void signal_callback(const std_msgs::Bool::ConstPtr& msg);
-        void cmd_vel_callback(const geometry_msgs::PointStamped::ConstPtr& msg);
+        void odom_callback(const nav_msgs::Odometry::ConstPtr msg);
+        void signal_callback(const std_msgs::Bool::ConstPtr msg);
+        void cmd_vel_callback(const geometry_msgs::PointStamped::ConstPtr msg);
         void odom_to_vec3();
         void target_to_vec3();
         void cal_odom_yaw();

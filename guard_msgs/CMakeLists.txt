@@ -18,11 +18,6 @@ add_message_files(
   AutoaimState.msg
 )
 
-add_service_files(
-  FILES
-  laserstate.srv
-)
-
 generate_messages(
   DEPENDENCIES
   std_msgs

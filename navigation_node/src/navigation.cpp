@@ -34,19 +34,23 @@ navigation::navigation()
     is_just_rotate = false;
 
     ROS_DEBUG("Init done");
+
+    main_process();
+
+    ros::spin();
 }
 
-void navigation::odom_callback(const nav_msgs::Odometry::ConstPtr& msg)
+void navigation::odom_callback(const nav_msgs::Odometry::ConstPtr msg)
 {
     this->odom = (*msg);
 }
 
-void navigation::signal_callback(const std_msgs::Bool::ConstPtr& msg)
+void navigation::signal_callback(const std_msgs::Bool::ConstPtr msg)
 {
     this->is_navigating = msg->data;
 }
 
-void navigation::cmd_vel_callback(const geometry_msgs::PointStamped::ConstPtr& msg)
+void navigation::cmd_vel_callback(const geometry_msgs::PointStamped::ConstPtr msg)
 {
     this->point = (*msg);
     start_navigation = true;
