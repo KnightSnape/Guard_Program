@@ -38,7 +38,6 @@ include_directories(
 add_executable(
   navigation_node
   src/navigation_node.cpp
-  src/navigation.cpp
 )
 
 target_link_libraries(
