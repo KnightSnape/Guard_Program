@@ -77,6 +77,8 @@ namespace decision_tree
             StandBy_Control standBy_control;
             //自瞄控制
             AutoAim_Control autoaim_control;
+            //云台自瞄状态控制
+            AutoAim_State_Control autoaim_state_control;
             //云台手指令状态
             CMD_Command command_mode;
             //底盘状态

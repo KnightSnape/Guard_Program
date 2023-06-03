@@ -18,6 +18,8 @@ BehaviorState Gimbal_Switch::Update()
     if(blackboard_ptr_->is_auto_aim_received && blackboard_ptr_->auto_aim_msg.target_id != 0)
     {
         blackboard_ptr_->gimbal_mode = Gimbal_Mode::FOLLOW_AUTOAIM;
+        blackboard_ptr_->autoaim_state_control.remain_control_time = blackboard_ptr_->autoaim_state_control.max_control_time;
+        blackboard_ptr_->autoaim_state_control.is_cmd = true;
         ROS_DEBUG("Get Gimbal AutoAim State");
     }
     if(blackboard_ptr_->is_client_command_received)
@@ -28,30 +30,39 @@ BehaviorState Gimbal_Switch::Update()
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::WARN_CAPTAIN)
     {
         ROS_DEBUG("Listening Captain");
-        gimbal_exe_ptr_->operate_state(1);
+        gimbal_exe_ptr_->operate_state(Gimbal_Mode::WARN_CAPTAIN);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::LOW_SPEED)
     {   
         ROS_DEBUG("Start LOW_SPEED");
-        gimbal_exe_ptr_->operate_state(2);
+        gimbal_exe_ptr_->operate_state(Gimbal_Mode::LOW_SPEED);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::HIGH_SPEED)
     {
         ROS_DEBUG("Start HIGH_SPEED");
-        gimbal_exe_ptr_->operate_state(3);
+        gimbal_exe_ptr_->operate_state(Gimbal_Mode::HIGH_SPEED);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::SCANNING)
     {
         ROS_DEBUG("Start Scanning");
-        gimbal_exe_ptr_->operate_state(4);
+        gimbal_exe_ptr_->operate_state(Gimbal_Mode::SCANNING);
     }
     if(blackboard_ptr_->gimbal_mode == Gimbal_Mode::FOLLOW_AUTOAIM)
     {
-    
         if(!blackboard_ptr_->is_auto_aim_received)
         {
-
-            return BehaviorState::SUCCESS;
+            blackboard_ptr_->autoaim_state_control.remain_control_time = blackboard_ptr_->autoaim_state_control.remain_control_time - blackboard_ptr_->average_time;
+            gimbal_exe_ptr_->operate_state(Gimbal_Mode::STEADY);
+            if(blackboard_ptr_->autoaim_state_control.remain_control_time <= 0)
+            {
+                blackboard_ptr_->autoaim_state_control.remain_control_time = 0;
+                blackboard_ptr_->autoaim_state_control.is_cmd = false;
+                blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING;
+            }
+        }
+        else
+        {
+            gimbal_exe_ptr_->operate_state(Gimbal_Mode::FOLLOW_AUTOAIM);
         }
     }
     return BehaviorState::SUCCESS;

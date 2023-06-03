@@ -13,6 +13,9 @@ Gimbal_executor::Gimbal_executor()
     yaw_rotate_speed = Config["yaw_work_speed"].as<double>();
     pitch_rotate_speed = Config["pitch_rotate_speed"].as<double>();
     rotate_freq = Config["rotate_freq"].as<double>();
+    k_autoaim = Config["k_autoaim"].as<double>();
+    x_offset = Config["x_offset"].as<double>();
+    y_offset = Config["y_offset"].as<double>();
 
     std::string pitch_set_topic = Topic["Advertise"]["pitch_set_topic"].as<std::string>();
     std::string yaw_set_topic = Topic["Advertise"]["yaw_set_topic"].as<std::string>();
@@ -35,16 +38,24 @@ void Gimbal_executor::get_yaw_now(gary_msgs::DualLoopPIDWithFilter msg)
     gimbal_yaw_now = msg.outer_feedback;
 }
 
-void Gimbal_executor::operate_state(int state)
+void Gimbal_executor::get_autoaim_target(gary_msgs::AutoAIM msg)
 {
-    if(state == 0)
-        return;
-    if(state == 1)
+    this->pitch_autoaim = msg.pitch;
+    this->yaw_autoaim = msg.yaw;
+}
+
+void Gimbal_executor::operate_state(Gimbal_Mode state)
+{
+    if(state == Gimbal_Mode::STEADY)
+    {
+        
+    }
+    if(state == Gimbal_Mode::WARN_CAPTAIN)
     {
         
     }
     //LOW_SPEED
-    if(state == 2)
+    if(state == Gimbal_Mode::LOW_SPEED)
     {
         yaw_upper_threshold = 40.0;
         yaw_lower_threshold = -40.0;
@@ -85,7 +96,7 @@ void Gimbal_executor::operate_state(int state)
         }
     }
     //HIGH_SPEED
-    if(state == 3)
+    if(state == Gimbal_Mode::HIGH_SPEED)
     {
         yaw_upper_threshold = 70.0;
         yaw_lower_threshold = -70.0;
@@ -126,7 +137,7 @@ void Gimbal_executor::operate_state(int state)
         }
     }
     //SCANNING
-    if(state == 4)
+    if(state == Gimbal_Mode::SCANNING)
     {
         double gimbal_yaw_delta = (PI * 2.0) * yaw_rotate_speed / rotate_freq;
         //等会儿考虑pitch
@@ -149,7 +160,11 @@ void Gimbal_executor::operate_state(int state)
                 pitch_sign = true;
             }
         }
-
+    }
+    if(state == Gimbal_Mode::FOLLOW_AUTOAIM)
+    {
+        gimbal_pitch_now = gimbal_pitch_now - pitch_autoaim * k_autoaim + x_offset;
+        gimbal_yaw_now = gimbal_yaw_now - yaw_autoaim * k_autoaim + y_offset;
     }
     pitch_msg.data = gimbal_pitch_now;
     yaw_msg.data = gimbal_yaw_now;

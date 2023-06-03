@@ -99,6 +99,17 @@ struct AutoAim_Control
     double remain_control_time;
 };
 
+struct AutoAim_State_Control
+{
+    //是否启用
+    bool is_cmd;
+    //控制最大时间
+    double max_control_time;
+    //剩余时间
+    double remain_control_time;
+};
+
+
 enum class CMD_Command
 {
     INITIAL = 0,//无变化
@@ -132,7 +143,7 @@ enum class Chassis_Mode
 //云台状态
 enum class Gimbal_Mode
 {
-    INITIAL = 0,//无变化，静止(但可以测试自瞄，然而不能发弹丸)
+    STEADY = 0,//无变化，静止(但可以测试自瞄，然而不能发弹丸)
     LOW_SPEED = 1,//低速平转巡航，存在角度控制
     HIGH_SPEED = 2,//高度平转巡航
     SCANNING = 3,//360度中速巡航

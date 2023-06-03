@@ -32,6 +32,7 @@ void Blackboard::init_params()
     shoot_control.max_control_time = Config["max_shoot_control_remain_time"].as<double>();
     standBy_control.max_control_time = Config["max_standby_control_remain_time"].as<double>();
     autoaim_control.max_control_time = Config["max_autoaim_control_remain_time"].as<double>();
+    autoaim_state_control.max_control_time = Config["max_autoaim_state_control_remain_time"].as<double>();
 
     YAML::Node Topic = YAML::LoadFile(topic_path);
     pitch_now_topic = Topic["Subscribe"]["pitch_now_topic"].as<std::string>();
@@ -68,7 +69,7 @@ Blackboard::Blackboard():is_pitch_now_received(false),
     navigation_target_id = 0;
 
     chassis_mode = Chassis_Mode::INITIAL;
-    gimbal_mode = Gimbal_Mode::INITIAL;
+    gimbal_mode = Gimbal_Mode::STEADY;
     command_mode = CMD_Command::INITIAL;
     autoaim_mode = AutoAim_Mode::INITIAL;
     
@@ -113,6 +114,7 @@ void Blackboard::Auto_Aim_Callback(const gary_msgs::AutoAIM::ConstPtr msg)
 {
     auto_aim_mutex.lock();
     auto_aim_msg = *msg;
+    if(!auto_aim_msg.target_id != gary_msgs::AutoAIM::TARGET_ID0_NONE)
     is_auto_aim_received = true;
     auto_aim_mutex.unlock();
 }

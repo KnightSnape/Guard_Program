@@ -10,7 +10,6 @@ void AutoAim_executor::initParam(ros::NodeHandle &nh)
     status_publisher = nh.advertise<guard_msgs::AutoaimState>(autoaim_state_topic,5);
 }
 
-
 void AutoAim_executor::pub_autoaim_state(int state,int target_id)
 {
     guard_msgs::AutoaimState status_msg;

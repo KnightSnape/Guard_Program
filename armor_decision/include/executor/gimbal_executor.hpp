@@ -14,9 +14,10 @@ class Gimbal_executor
         typedef std::shared_ptr<Gimbal_executor> Ptr;
 
         Gimbal_executor();
-        void operate_state(int state);
+        void operate_state(Gimbal_Mode state);
         void get_pitch_now(gary_msgs::DualLoopPIDWithFilter msg);
         void get_yaw_now(gary_msgs::DualLoopPIDWithFilter msg);
+        void get_autoaim_target(gary_msgs::AutoAIM msg);
 
         double gimbal_pitch_min{};
         double gimbal_pitch_max{};
@@ -24,6 +25,11 @@ class Gimbal_executor
         double gimbal_yaw_now{};
         double yaw_rotate_speed{};
         double pitch_rotate_speed{};
+        double pitch_autoaim{};
+        double yaw_autoaim{};
+        double k_autoaim{};
+        double x_offset{};
+        double y_offset{};
         double rotate_freq;
         double pitch_upper_threshold;
         double pitch_lower_threshold;

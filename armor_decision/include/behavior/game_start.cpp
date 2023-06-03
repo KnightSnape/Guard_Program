@@ -21,7 +21,7 @@ BehaviorState GameStart::Update()
     {
         ROS_DEBUG("not start yet");
         blackboard_ptr_->chassis_mode = Chassis_Mode::INITIAL;
-        blackboard_ptr_->gimbal_mode = Gimbal_Mode::INITIAL;
+        blackboard_ptr_->gimbal_mode = Gimbal_Mode::STEADY;
         blackboard_ptr_->autoaim_mode = AutoAim_Mode::INITIAL;
         return BehaviorState::FAILURE;
     }

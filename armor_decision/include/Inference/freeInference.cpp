@@ -50,7 +50,7 @@ void FreeInference::main_process(int &target,Gimbal_Mode& gimbal_mode,AutoAim_Mo
     if(mode == 0)
     {
         target = 0;
-        gimbal_mode = Gimbal_Mode::INITIAL;
+        gimbal_mode = Gimbal_Mode::STEADY;
         autoaim_mode = AutoAim_Mode::INITIAL;
         return;
     }
