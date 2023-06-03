@@ -255,6 +255,30 @@ void Blackboard::Client_Command_State_Transform()
     {
         command_mode = CMD_Command::MOVE_RIGHT_ABS;
     }
+    else if((char)client_command_msg.keyboard_key_pressed == 'V')
+    {
+        command_mode = CMD_Command::TARGET_TO_HOME;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'N')
+    {
+        command_mode = CMD_Command::TARGET_TO_PATRAL_AREA;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'K')
+    {
+        command_mode = CMD_Command::TARGET_TO_MY_OUTPOST;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'L')
+    {
+        command_mode = CMD_Command::TARGET_TO_MY_STEP;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'U')
+    {
+        command_mode = CMD_Command::TARGET_TO_ENEMY_OUTPOST;
+    }
+    else if((char)client_command_msg.keyboard_key_pressed == 'O')
+    {
+        command_mode = CMD_Command::TARGET_TO_ENEMY_PATRAL;
+    }
     
 
 }

@@ -14,8 +14,11 @@
 #include<mutex>
 
 nav_msgs::Odometry odom;
+geometry_msgs::PointStamped stamp;
 bool is_odom_sub;
 bool is_signal = false;
+bool is_start = false;
+
 Eigen::Vector3d self_pos;
 Eigen::Vector3d target_pos;
 Eigen::Quaterniond self_q;
@@ -31,18 +34,27 @@ void signal_callback(const std_msgs::Bool::ConstPtr msg)
     is_signal = msg->data;
 }
 
+void target_callback(const geometry_msgs::PointStamped::ConstPtr msg)
+{
+    std::cout<<2<<std::endl;
+    target_pos.x() = msg->point.x;
+    target_pos.y() = msg->point.y;
+    target_pos.z() = msg->point.z;
+    is_start = true;
+}
+
 int main(int argc,char **argv)
 {
     ros::init(argc,argv,"navigation_node");
     ros::NodeHandle nh;
     is_odom_sub = false;
     ros::Subscriber odom_sub = nh.subscribe<nav_msgs::Odometry>("/Odometry",100000,odometry_callback);
+    ros::Subscriber target_sub = nh.subscribe<geometry_msgs::PointStamped>("/way_point",1,target_callback);
     ros::Subscriber signal_sub = nh.subscribe<std_msgs::Bool>("/use_navigation",5,signal_callback);
-
     ros::Publisher cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("/cmd_vel",5);
     while(ros::ok())
     {
-        if(is_odom_sub)
+        if(is_odom_sub && is_start)
         {
             self_pos.x() = odom.pose.pose.position.x;
             self_pos.y() = odom.pose.pose.position.y;
@@ -60,7 +72,6 @@ int main(int argc,char **argv)
             geometry_msgs::Quaternion geoQuat = odom.pose.pose.orientation;
             tf::Matrix3x3(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w)).getRPY(roll, pitch, yaw);
 
-            target_pos << 1.0, 0, 0;
             Eigen::Vector2d target_pos_2d{target_pos[0],target_pos[1]};
             Eigen::Vector2d self_pos_2d{self_pos[0],self_pos[1]};
             Eigen::Vector2d delta_pos = target_pos_2d - self_pos_2d;
@@ -91,12 +102,15 @@ int main(int argc,char **argv)
                     final_speed = 1.0;
                 else if(norm > 0.2 && norm <= 3)
                     final_speed = 0.5;
-                else 
+                else if(norm > 0.08 && norm <= 0.2)
                     final_speed = 0.1;
+                else 
+                    final_speed = 0;
                 final_twist.x() = final_speed;
                 final_twist.y() = 0.0;
                 final_twist.z() = 0.0;
             }
+            std::cout<<1<<std::endl;
 
             geometry_msgs::TwistStamped twist;
             twist.header.frame_id = "camera_init";

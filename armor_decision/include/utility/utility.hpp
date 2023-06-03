@@ -127,6 +127,12 @@ enum class CMD_Command
     MOVE_DOWN_ABS = 12,//强制向后
     MOVE_LEFT_ABS = 13,//强制向左
     MOVE_RIGHT_ABS = 14,//强制向右
+    TARGET_TO_HOME = 15,//初始巡逻区位置
+    TARGET_TO_PATRAL_AREA = 16,//狙击点巡逻区位置
+    TARGET_TO_MY_OUTPOST = 17,//我方前哨战前
+    TARGET_TO_MY_STEP = 18,//我方台阶上
+    TARGET_TO_ENEMY_OUTPOST = 19,//敌方前哨战前
+    TARGET_TO_ENEMY_PATRAL = 20,//敌方巡逻区前
 };
 
 //底盘状态
