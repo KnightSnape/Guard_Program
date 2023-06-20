@@ -12,7 +12,7 @@ Chassis_executor::Chassis_executor()
 
     navigation_point_pub = nh_.advertise<geometry_msgs::PointStamped>(navigation_target_topic,5);
     joy_pub = nh_.advertise<sensor_msgs::Joy>(joy_topic,5);
-    twist_vector_pub = nh_.advertise<geometry_msgs::TwistStamped>(cmd_twist_topic,5);
+    twist_vector_pub = nh_.advertise<geometry_msgs::Twist>(cmd_twist_topic,5);
     use_navigation_pub = nh_.advertise<std_msgs::Bool>(use_navigation_topic,1);
 }
 
@@ -62,10 +62,8 @@ void Chassis_executor::pub_stop_signal()
     use_navigation_pub.publish(navigation_stop);
 }
 
-void Chassis_executor::pub_twist(geometry_msgs::TwistStamped msg)
+void Chassis_executor::pub_twist(geometry_msgs::Twist msg)
 {
-    msg.header.stamp = ros::Time::now();
-    msg.header.frame_id = "camera_init";
     twist_vector_pub.publish(msg);
 
     std_msgs::Bool navigating;

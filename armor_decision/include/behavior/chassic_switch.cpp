@@ -15,6 +15,10 @@ Chassis_Switch::Chassis_Switch(std::string name,
 BehaviorState Chassis_Switch::Update()
 {
     cv::Point sentry_point = cv::Point(blackboard_ptr_->sentry_map_point.x(),blackboard_ptr_->sentry_map_point.y());
+    if(blackboard_ptr_->dr16_receive_msg.sw_right != blackboard_ptr_->dr16_receive_msg.SW_UP)
+    {
+        return BehaviorState::SUCCESS;
+    }
     //已经接收到了云台手指令
     if(blackboard_ptr_->is_client_command_received)
     {
@@ -30,6 +34,8 @@ BehaviorState Chassis_Switch::Update()
             blackboard_ptr_->chassis_mode = Chassis_Mode::LISTEN_CAPTAIN;
         }
     }
+    if(blackboard_ptr_->chassis_mode == Chassis_Mode::INITIAL)
+        return BehaviorState::SUCCESS;
     //正在导航状态 
     if(blackboard_ptr_->chassis_mode == Chassis_Mode::NAVIGATING)
     {
@@ -81,7 +87,12 @@ BehaviorState Chassis_Switch::Update()
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS) || 
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS) || 
             (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS) || 
-            (blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING))
+            (blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_UP) || 
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_UP) ||
+            (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_DOWN) ||
+            (blackboard_ptr_->command_mode == CMD_Command::LOOKAT)) 
             {
                 ROS_DEBUG("Switch to captain control mode");
                 blackboard_ptr_->chassis_mode = Chassis_Mode::CAPTAIN_CONTROL;
@@ -119,12 +130,43 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->next_target_id = blackboard_ptr_->graph.get_first_point(blackboard_ptr_->now_id,blackboard_ptr_->navigation_target_id);
             }
             blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
+            return BehaviorState::SUCCESS;
         }
         if(blackboard_ptr_->command_mode == CMD_Command::REPOS)
         {
             //TODO(Knight):Add method
         }
-        return BehaviorState::SUCCESS;
+        if(blackboard_ptr_->command_mode == CMD_Command::START_ROTATE)
+        {
+            ROS_INFO("switch to rotate");
+            chassis_exe_ptr_->pub_stop_signal();
+            geometry_msgs::Twist twist;
+            twist.linear.x = 0.0;
+            twist.linear.y = 0.0;
+            twist.linear.z = 0.0;
+            twist.angular.x = 0.0;
+            twist.angular.y = 0.0;
+            twist.angular.z = 420.0 / 180 * M_PI;
+            chassis_exe_ptr_->pub_twist(twist);
+            blackboard_ptr_->chassis_mode = Chassis_Mode::ROTATE;
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING;
+            return BehaviorState::SUCCESS;
+        }
+        if(blackboard_ptr_->command_mode == CMD_Command::STOP_ROTATE)
+        {
+            chassis_exe_ptr_->pub_stop_signal();
+            geometry_msgs::Twist twist;
+            twist.linear.x = 0.0;
+            twist.linear.y = 0.0;
+            twist.linear.z = 0.0;
+            twist.angular.x = 0.0;
+            twist.angular.y = 0.0;
+            twist.angular.z = 0.0;
+            chassis_exe_ptr_->pub_twist(twist);
+            blackboard_ptr_->chassis_mode = Chassis_Mode::STANDBY;
+            return BehaviorState::SUCCESS;
+        }
+
     }
     //云台手控制模式
     if(blackboard_ptr_->chassis_mode == Chassis_Mode::CAPTAIN_CONTROL)
@@ -133,68 +175,176 @@ BehaviorState Chassis_Switch::Update()
         //直接控制方向移动
         if(blackboard_ptr_->command_mode == CMD_Command::MOVE_UP)
         {
-            ROS_DEBUG("start control up");
-            blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
-                                                       2,twist_yaw_angle);
+            ROS_INFO("start control up");
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                       4,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                       2,twist_yaw_angle);   
+            }
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN)
         {
             ROS_DEBUG("start control down");
-            blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        2,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         4,twist_yaw_angle);
+            }
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT)
         {
             ROS_DEBUG("start control left");
-            blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         3,twist_yaw_angle);
-
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        1,twist_yaw_angle);
+            }
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT)
         {
             ROS_DEBUG("start control right");
-            blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         1,twist_yaw_angle);
-            
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        3,twist_yaw_angle);              
+            }
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_UP)
+        {
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        5,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        8,twist_yaw_angle);              
+            } 
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN)
+        {
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        7,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        6,twist_yaw_angle);              
+            } 
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_UP)
+        {
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        6,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        7,twist_yaw_angle);              
+            } 
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN)
+        {
+            if(blackboard_ptr_->robot_status_msg.robot_id < (uint8_t)20)
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        8,twist_yaw_angle);
+            }
+            else
+            {
+                blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
+                                                        5,twist_yaw_angle);              
+            }
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+        }
+        else if(blackboard_ptr_->command_mode == CMD_Command::LOOKAT)
+        {
+            Eigen::Vector3d target_eigen{blackboard_ptr_->client_command_msg.target_position_x,
+                                         blackboard_ptr_->client_command_msg.target_position_y,
+                                         blackboard_ptr_->client_command_msg.target_position_z};
+            Eigen::Vector2i target_2d = blackboard_ptr_->pos_manager.world_to_map(target_eigen);
+            if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
+                target_2d = blackboard_ptr_->pos_manager.inverse_point(target_2d);
+            Eigen::Vector3d pos_robot = blackboard_ptr_->pos_manager.get_guard_world_pos();
+            Eigen::Vector2i self_2d = blackboard_ptr_->pos_manager.robot_to_map(pos_robot);
+            double target_angle = - blackboard_ptr_->pos_manager.calculate_relative_angle(self_2d,target_2d);
+            blackboard_ptr_->pos_manager.rotate_process(twist_yaw_angle,target_angle);
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::HIGH_SPEED;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS)
         {
             ROS_DEBUG("start control up abs");
-            blackboard_ptr_->command_control.twist_x = 0.3;
+            blackboard_ptr_->command_control.twist_x = 0.1;
             blackboard_ptr_->command_control.twist_y = 0;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS)
         {
             ROS_DEBUG("start control down abs");
-            blackboard_ptr_->command_control.twist_x = -0.3;
+            blackboard_ptr_->command_control.twist_x = -0.1;
             blackboard_ptr_->command_control.twist_y = 0;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS)
         {
             ROS_DEBUG("start control left abs");
             blackboard_ptr_->command_control.twist_x = 0;
-            blackboard_ptr_->command_control.twist_y = 0.3;
+            blackboard_ptr_->command_control.twist_y = 0.1;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS)
         {
             ROS_DEBUG("start control right abs");
             blackboard_ptr_->command_control.twist_x = 0;
-            blackboard_ptr_->command_control.twist_y = -0.3;
+            blackboard_ptr_->command_control.twist_y = -0.1;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::STOP_MOVING)
         {
             blackboard_ptr_->command_control.twist_x = 0;
             blackboard_ptr_->command_control.twist_y = 0;
+            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING;
         }
-        geometry_msgs::TwistStamped twist;
-        twist.twist.angular.x = 0.0;
-        twist.twist.angular.y = 0.0;
-        twist.twist.angular.z = twist_yaw_angle;
-        twist.twist.linear.x = blackboard_ptr_->command_control.twist_x;
-        twist.twist.linear.y = blackboard_ptr_->command_control.twist_y;
-        twist.twist.linear.z = 0.0;
+        geometry_msgs::Twist twist;
+        twist.angular.x = 0.0;
+        twist.angular.y = 0.0;
+        twist.angular.z = twist_yaw_angle;
+        twist.linear.x = blackboard_ptr_->command_control.twist_x;
+        twist.linear.y = blackboard_ptr_->command_control.twist_y;
+        twist.linear.z = 0.0;
+        chassis_exe_ptr_->pub_twist(twist);
         //剩余时间控制
+        if(twist_yaw_angle == 0)
         blackboard_ptr_->command_control.remain_control_time = blackboard_ptr_->command_control.remain_control_time - blackboard_ptr_->average_time;
         if(blackboard_ptr_->command_control.remain_control_time <= 0)
         {
@@ -219,6 +369,19 @@ BehaviorState Chassis_Switch::Update()
             //再次进入自由决策模式
             blackboard_ptr_->chassis_mode = Chassis_Mode::FREE_CAPTAIN;
         }
+        return BehaviorState::SUCCESS;
+    }
+
+    if(blackboard_ptr_->chassis_mode == Chassis_Mode::ROTATE)
+    {
+        geometry_msgs::Twist twist;
+        twist.linear.x = 0.0;
+        twist.linear.y = 0.0;
+        twist.linear.z = 0.0;
+        twist.angular.x = 0.0;
+        twist.angular.y = 0.0;
+        twist.angular.z = 420.0 / 180 * M_PI;
+        chassis_exe_ptr_->pub_twist(twist);
         return BehaviorState::SUCCESS;
     }
 
@@ -274,7 +437,14 @@ bool Chassis_Switch::checkchassic()
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS) ||
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN_ABS) || 
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_ABS) || 
-                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS);
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_ABS) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::START_ROTATE) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::STOP_ROTATE)|| 
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_UP) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_UP) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_DOWN) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::LOOKAT);
 
     return check; 
 }

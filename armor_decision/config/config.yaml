@@ -6,17 +6,17 @@
 #5:NETWORK
 mode: 0
 
-max_command_control_remain_time: 5.0
+max_command_control_remain_time: 40.0
 max_shoot_control_remain_time: 5.0
 max_standby_control_remain_time: 5.0 
 max_autoaim_control_remain_time: 5.0
 max_autoaim_state_control_remain_time: 3.0
 
-pitch_upper_threshold: 12.0
-pitch_lower_threshold: -5.0
-yaw_work_speed: 5.1213
-pitch_rotate_speed: 1.12
+pitch_upper_threshold: 8.0
+pitch_lower_threshold: -8.0
+yaw_work_speed: 0.20
+pitch_rotate_speed: 0.10
 rotate_freq: 100.0
-k_autoaim: 1.0
-x_offset: 0.03
-y_offset: -0.055
+k_autoaim: 0.2
+x_offset: 0.02
+y_offset: 0.0

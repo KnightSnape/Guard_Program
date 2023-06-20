@@ -47,21 +47,7 @@ void FreeInference::get_robotposition(const gary_msgs::RobotPosition &msg)
 
 void FreeInference::main_process(int &target,Gimbal_Mode& gimbal_mode,AutoAim_Mode& autoaim_mode)
 {
-    if(mode == 0)
-    {
-        target = 0;
-        gimbal_mode = Gimbal_Mode::STEADY;
-        autoaim_mode = AutoAim_Mode::INITIAL;
-        return;
-    }
-    if(mode == 1)
-    {
-        target = 5;
-        gimbal_mode = Gimbal_Mode::SCANNING;
-        autoaim_mode = AutoAim_Mode::NORMAL;
-        return;
-    }
-    //TODO(Knight):Finish Third,Fourth Method
+    
 }
 
 }

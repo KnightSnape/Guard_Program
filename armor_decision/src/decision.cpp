@@ -5,8 +5,8 @@ namespace decision_tree
     decision_node::decision_node()
     {
         ros::NodeHandle nh;
-        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
-        loop_rate_ = 5;//10Hz or 30Hz, 控制处理频率
+        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+        loop_rate_ = 100;//10Hz or 30Hz, 控制处理频率
 
         //导入新地图
         blackboard_ = std::make_shared<Blackboard>();
@@ -25,8 +25,8 @@ namespace decision_tree
         Gimbal_Switch* gimbal_node = new Gimbal_Switch("gimbal",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
         AutoAim_Switch* autoaim_node = new AutoAim_Switch("autoaim",1,blackboard_,chassis_exe_,gimbal_exe_,log_exe_,autoaim_exe_);
 
+//      root_node->addChild(start);
         root_node->addChild(chassis_node);
-        root_node->addChild(start);
         root_node->addChild(gimbal_node);
         root_node->addChild(autoaim_node);
         
@@ -48,6 +48,7 @@ namespace decision_tree
             {
                 cnt = 0;
             }
+            blackboard_->reset_flag();
             loop_rate.sleep();
         }
     }

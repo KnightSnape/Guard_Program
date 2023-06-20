@@ -14,6 +14,8 @@
 #include"xmlrpcpp/XmlRpc.h"
 #include"std_msgs/Float64.h"
 #include"nav_msgs/Odometry.h"
+#include<tf/transform_datatypes.h>
+#include<tf/transform_broadcaster.h>
 #include"gary_msgs/AutoAIM.h"
 #include"gary_msgs/RobotHP.h"
 #include"gary_msgs/BulletRemaining.h"
@@ -26,6 +28,7 @@
 #include"gary_msgs/ClientReceive.h"
 #include"gary_msgs/VisionModeSwitch.h"
 #include"gary_msgs/DualLoopPID.h"
+#include"gary_msgs/DR16Receiver.h"
 #include"gary_msgs/DualLoopPIDWithFilter.h"
 #include"gary_msgs/VisionModeSwitchRequest.h"
 #include"gary_msgs/VisionModeSwitchResponse.h"
@@ -133,6 +136,12 @@ enum class CMD_Command
     TARGET_TO_MY_STEP = 18,//我方台阶上
     TARGET_TO_ENEMY_OUTPOST = 19,//敌方前哨战前
     TARGET_TO_ENEMY_PATRAL = 20,//敌方巡逻区前
+    START_ROTATE = 21,//开启小陀螺
+    STOP_ROTATE = 22,//停止小陀螺
+    MOVE_RIGHT_UP = 23,
+    MOVE_RIGHT_DOWN = 24,
+    MOVE_LEFT_UP = 25,
+    MOVE_LEFT_DOWN = 26,
 };
 
 //底盘状态
@@ -145,16 +154,18 @@ enum class Chassis_Mode
     FREE_CAPTAIN = 4,//自动判断已有信息后，选择点位进行导航
     NAVIGATING = 5,//导航进行中，此时只有云台手指令才能打断
     CAPTAIN_CONTROL = 6,//云台手控制模式
+    ROTATE = 7,//小陀螺模式
 }; 
 //云台状态
 enum class Gimbal_Mode
 {
-    STEADY = 0,//无变化，静止(但可以测试自瞄，然而不能发弹丸)
-    LOW_SPEED = 1,//低速平转巡航，存在角度控制
-    HIGH_SPEED = 2,//高度平转巡航
-    SCANNING = 3,//360度中速巡航
-    WARN_CAPTAIN = 4,//优先级高于跟随自瞄目标，云台一定转向云台手发送的方向
-    FOLLOW_AUTOAIM = 5,//跟随自瞄目标
+    NO_FORCE = 0,//无力，不发送
+    STEADY = 1,//无变化，静止(但可以测试自瞄，然而不能发弹丸)
+    LOW_SPEED = 2,//低速平转巡航，存在角度控制
+    HIGH_SPEED = 3,//高度平转巡航
+    SCANNING = 4,//360度中速巡航
+    WARN_CAPTAIN = 5,//优先级高于跟随自瞄目标，云台一定转向云台手发送的方向
+    FOLLOW_AUTOAIM = 6,//跟随自瞄目标
 };
 
 enum class AutoAim_Mode

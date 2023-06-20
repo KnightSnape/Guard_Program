@@ -2,7 +2,7 @@
 
 Pos_Manager::Pos_Manager()
 {
-    max_rotate_angle = 10.0 / 180.0 * PI;
+    max_rotate_angle = 40.0 / 180.0 * PI;
     this->pos_x_zero = 170;
     this->pos_y_zero = 225;
 }
@@ -18,8 +18,8 @@ Eigen::Vector2i Pos_Manager::inverse_point(const Eigen::Vector2i &p)
 Eigen::Vector2i Pos_Manager::world_to_map(const Eigen::Vector3d &pw)
 {
     Eigen::Vector2i map_pos;
-    map_pos.x() = ((int)(pw.x() / 28.0 * 840)) + pos_x_zero;
-    map_pos.y() = (450 - (int)(pw.y() / 15.0 * 450)) + pos_y_zero;
+    map_pos.x() = ((int)(pw.x() / 28.0 * 840));
+    map_pos.y() = (450 - (int)(pw.y() / 15.0 * 450));
     return map_pos;
 }
 
@@ -31,6 +31,14 @@ Eigen::Vector3d Pos_Manager::map_to_world(const Eigen::Vector2i &pm)
     world_pos.y() = ((pm.y() - pos_y_zero) / 450.0 * 15);
     world_pos.z() = 0.0;
     return world_pos;
+}
+
+Eigen::Vector2i Pos_Manager::robot_to_map(const Eigen::Vector3d &pw)
+{
+    Eigen::Vector2i map_pos;
+    map_pos.x() = (int)(pw.y() / 28.0 * 840) + pos_x_zero;
+    map_pos.y() = (int)(-pw.x() / 28.0 * 840) + pos_y_zero;
+    return map_pos;
 }
 
 geometry_msgs::PointStamped Pos_Manager::transfer_to_msg(const Eigen::Vector3d &pw)
@@ -67,10 +75,9 @@ void Pos_Manager::set_guard_rotate_q(const nav_msgs::Odometry &odom)
     this->guard_rotate_q.z() = odom.pose.pose.orientation.z;
 }
 
-float Pos_Manager::get_yaw()
+double Pos_Manager::get_yaw()
 {
-    Eigen::Vector3d eular_angle = this->guard_rotate_q.matrix().eulerAngles(2,1,0);
-    return eular_angle[2];
+    return this->yaw;
 }
 
 Eigen::Vector3d Pos_Manager::get_guard_world_pos()
@@ -91,6 +98,11 @@ void Pos_Manager::set_pos_x_zero(int pos_x_zero)
 void Pos_Manager::set_pos_y_zero(int pos_y_zero)
 {
     this->pos_y_zero = pos_y_zero;
+}
+
+void Pos_Manager::setRPY()
+{
+    tf::Matrix3x3(tf::Quaternion(guard_rotate_q.x(), guard_rotate_q.y(), guard_rotate_q.z(), guard_rotate_q.w())).getRPY(roll, pitch, yaw);
 }
 
 void Pos_Manager::rotate_angle(float angle)
@@ -115,10 +127,10 @@ void Pos_Manager::speed_process(float &twist_x,float &twist_y,int mode,float &ya
     }
     else if(mode == 2)
     {
-        if(now_angle < -0.5 * PI)
-            need_yawangle = -1.5 * PI;
+        if(now_angle > 0.5 * PI)
+            need_yawangle = 1.5 * PI;
         else
-            need_yawangle = 0.5 * PI;
+            need_yawangle = -0.5 * PI;
     }
     else if(mode == 3)
     {
@@ -129,25 +141,77 @@ void Pos_Manager::speed_process(float &twist_x,float &twist_y,int mode,float &ya
     }
     else if(mode == 4)
     {
-        if(now_angle > 0.5 * PI)
-            need_yawangle = 0.5 * PI;
+        if(now_angle < -0.5 * PI)
+            need_yawangle = -1.5 * PI;
         else 
-            need_yawangle = -0.5 * PI;
+            need_yawangle = 0.5 * PI;
+    }
+    else if(mode == 5)
+    {
+        if(now_angle < -0.75 * PI)
+            need_yawangle = -1.75 * PI;
+        else    
+            need_yawangle = 0.25 * PI;
+    }
+    else if(mode == 6)
+    {
+        if(now_angle < -0.25 * PI)
+            need_yawangle = -1.25 * PI;
+        else
+            need_yawangle = 0.75 * PI;
+    }
+    else if(mode == 7)
+    {
+        if(now_angle > 0.75 * PI)
+            need_yawangle = 1.75 * PI;
+        else 
+            need_yawangle = -0.25 * PI;
+    }
+    else if(mode == 8)
+    {
+        if(now_angle > 0.25 * PI)
+            need_yawangle = 1.25 * PI;
+        else 
+            need_yawangle = -0.75 * PI;
     }
     ROS_DEBUG("now_angle is:%f,need_angle is:%f");
-    if(std::abs(now_angle - need_yawangle) > 1.0 / 180.0 * PI)
+    if(std::abs(now_angle - need_yawangle) > 6.0 / 180.0 * PI)
     {
-        yaw_angle = (std::abs(now_angle - need_yawangle) > max_rotate_angle) ? 
-                    (getsign(need_yawangle,now_angle) * max_rotate_angle) : 
-                    (getsign(need_yawangle,now_angle) * std::abs(now_angle - need_yawangle) / 2);
+        yaw_angle = (getsign(need_yawangle,now_angle) * max_rotate_angle);
         twist_x = 0.0;
         twist_y = 0.0;
     }
     else
     {
         yaw_angle = 0;
-        twist_x = 0.3;
+        twist_x = 0.35;
         twist_y = 0;
     }
 }
 
+void Pos_Manager::rotate_process(float& yaw_angle,const float& target_yaw_angle)
+{
+    float now_angle = get_yaw();
+    if(std::abs(now_angle - target_yaw_angle) > 30.0 / 180.0 * PI)
+    {
+        yaw_angle = (getsign(target_yaw_angle,now_angle) * max_rotate_angle) * 10;
+    }
+    else if(std::abs(now_angle - target_yaw_angle) > 15.0 / 180.0 * PI)
+    {
+        yaw_angle = (getsign(target_yaw_angle,now_angle) * max_rotate_angle) * 3;
+    }
+    else
+    {
+        yaw_angle = 0;
+    }
+}
+
+double Pos_Manager::calculate_relative_angle(const Eigen::Vector2i &a1, const Eigen::Vector2i &a2)
+{
+   Eigen::Vector2i delta_pos = a2 - a1;
+   Eigen::Vector2i x_pos{1,0};
+   double dot = (double)(delta_pos.x() * x_pos.x() + delta_pos.y() * x_pos.y());
+   double cross = (double)(x_pos.x() * delta_pos.y() - x_pos.y() * delta_pos.x());
+   double angle = atan2(cross,dot);
+   return angle;
+}

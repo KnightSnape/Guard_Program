@@ -36,7 +36,6 @@ void signal_callback(const std_msgs::Bool::ConstPtr msg)
 
 void target_callback(const geometry_msgs::PointStamped::ConstPtr msg)
 {
-    std::cout<<2<<std::endl;
     target_pos.x() = msg->point.x;
     target_pos.y() = msg->point.y;
     target_pos.z() = msg->point.z;
@@ -51,10 +50,10 @@ int main(int argc,char **argv)
     ros::Subscriber odom_sub = nh.subscribe<nav_msgs::Odometry>("/Odometry",100000,odometry_callback);
     ros::Subscriber target_sub = nh.subscribe<geometry_msgs::PointStamped>("/way_point",1,target_callback);
     ros::Subscriber signal_sub = nh.subscribe<std_msgs::Bool>("/use_navigation",5,signal_callback);
-    ros::Publisher cmd_pub = nh.advertise<geometry_msgs::TwistStamped>("/cmd_vel",5);
+    ros::Publisher cmd_pub = nh.advertise<geometry_msgs::Twist>("/chassis/cmd_vel",5);
     while(ros::ok())
     {
-        if(is_odom_sub && is_start)
+        if(is_odom_sub && is_start && is_signal)
         {
             self_pos.x() = odom.pose.pose.position.x;
             self_pos.y() = odom.pose.pose.position.y;
@@ -71,56 +70,66 @@ int main(int argc,char **argv)
 
             geometry_msgs::Quaternion geoQuat = odom.pose.pose.orientation;
             tf::Matrix3x3(tf::Quaternion(geoQuat.x, geoQuat.y, geoQuat.z, geoQuat.w)).getRPY(roll, pitch, yaw);
-
             Eigen::Vector2d target_pos_2d{target_pos[0],target_pos[1]};
             Eigen::Vector2d self_pos_2d{self_pos[0],self_pos[1]};
             Eigen::Vector2d delta_pos = target_pos_2d - self_pos_2d;
-            Eigen::Vector2d x_pos{1.0,0};
+            Eigen::Vector2d x_pos{1,0};
+
             double norm = delta_pos.norm();
+            
+            yaw = yaw + (0.5 * M_PI);
+            if(yaw > M_PI)
+                yaw -= 2 * M_PI;
+
             if(norm == 0)
                 continue;
-            double cos_angle = (delta_pos.x() * x_pos.x() + delta_pos.y() * x_pos.y()) / norm;
-            double angle = acos(cos_angle);
+            
+            double dot = (delta_pos.x() * x_pos.x() + delta_pos.y() * x_pos.y());
+            double cross = (x_pos.x() * delta_pos.y() - x_pos.y() * delta_pos.x());
+            double angle = atan2(cross,dot);
             double delta_angle = yaw - angle;
+            if(delta_angle < -M_PI)
+                delta_angle += 2 * M_PI;
+            if(delta_angle > M_PI)
+                delta_angle -= 2 * M_PI;
+
             bool use_final_angle = false;
             double final_angle = 0.0;
-            if(delta_angle > 8.0 / 180 * M_PI)
+
+            Eigen::Vector2d e_pos2d{cos(yaw),sin(yaw)};
+            double cos_angle_temp = (delta_pos.x() * e_pos2d.x() + delta_pos.y() * e_pos2d.y()) / (delta_pos.norm() * e_pos2d.norm());
+            if(delta_angle > 5.0 / 180 * M_PI)
             {
-                final_angle = 5.0 / 180 * M_PI;
+                final_angle = 20.0 / 180 * M_PI;
                 use_final_angle = true;
             }
-            if(delta_angle < -8.0 / 180 * M_PI)
+            if(delta_angle < -5.0 / 180 * M_PI)
             {
-                final_angle = -5.0 / 180 * M_PI;
+                final_angle = -20.0 / 180 * M_PI;
                 use_final_angle = true;
             }
             Eigen::Vector3d final_twist = Eigen::Vector3d::Zero();
             if(!use_final_angle)
             {
                 double final_speed = 0;
-                if(norm > 3)
+                if(norm > 2)
                     final_speed = 1.0;
-                else if(norm > 0.2 && norm <= 3)
+                else if(norm > 0.1 && norm <= 4)
                     final_speed = 0.5;
-                else if(norm > 0.08 && norm <= 0.2)
-                    final_speed = 0.1;
                 else 
                     final_speed = 0;
                 final_twist.x() = final_speed;
                 final_twist.y() = 0.0;
                 final_twist.z() = 0.0;
             }
-            std::cout<<1<<std::endl;
 
-            geometry_msgs::TwistStamped twist;
-            twist.header.frame_id = "camera_init";
-            twist.header.stamp = ros::Time::now();
-            twist.twist.linear.x = final_twist.x();
-            twist.twist.linear.y = final_twist.y();
-            twist.twist.linear.z = final_twist.z();
-            twist.twist.angular.x = 0.0;
-            twist.twist.angular.y = 0.0;
-            twist.twist.angular.z = final_angle;
+            geometry_msgs::Twist twist;
+            twist.linear.x = final_twist.x();
+            twist.linear.y = final_twist.y();
+            twist.linear.z = final_twist.z();
+            twist.angular.x = 0.0;
+            twist.angular.y = 0.0;
+            twist.angular.z = final_angle;
 
             cmd_pub.publish(twist);
             is_odom_sub = false;

@@ -15,7 +15,7 @@ class Chassis_executor
         typedef std::shared_ptr<Chassis_executor> Ptr;
         Chassis_executor();
         void pub_nav_point(geometry_msgs::PointStamped msg);
-        void pub_twist(geometry_msgs::TwistStamped msg);
+        void pub_twist(geometry_msgs::Twist msg);
         void pub_stop_signal();
 
         ros::NodeHandle nh_;

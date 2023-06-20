@@ -36,6 +36,7 @@ namespace decision_tree
             gary_msgs::RobotPosition robot_position_msg;
             gary_msgs::RobotStatus robot_status_msg;
             gary_msgs::ClientCommand client_command_msg;
+            gary_msgs::DR16Receiver dr16_receive_msg;
             gary_msgs::ClientReceive client_receive_msg;
             gary_msgs::VisionModeSwitch vision_mode_switch_srv;
             nav_msgs::Odometry odometry_msg;
@@ -52,6 +53,7 @@ namespace decision_tree
             std::mutex robot_status_mutex;
             std::mutex client_command_mutex;
             std::mutex client_receive_mutex;
+            std::mutex dr16_receive_mutex;
             std::mutex vision_mode_switch_mutex;
             std::mutex odometry_mutex;
 
@@ -67,6 +69,7 @@ namespace decision_tree
             bool is_robot_status_received;
             bool is_client_command_received;
             bool is_client_receive_received;
+            bool is_dr16_receive_received;
             bool is_odometry_received;
 
             //手控命令控制
@@ -85,6 +88,8 @@ namespace decision_tree
             Chassis_Mode chassis_mode;
             //云台状态
             Gimbal_Mode gimbal_mode;
+            //上一个云台模式
+            Gimbal_Mode last_gimbal_mode;
             //自瞄状态
             AutoAim_Mode autoaim_mode;
             //对应的有向图
@@ -103,7 +108,7 @@ namespace decision_tree
             int next_target_id;
             //平均一次处理的时间
             double average_time;
-
+            //哨兵
             Eigen::Vector2i sentry_map_point;
 
         private:
@@ -121,6 +126,7 @@ namespace decision_tree
             ros::Subscriber robot_position_sub;
             ros::Subscriber robot_status_sub;
             ros::Subscriber client_command_sub;
+            ros::Subscriber dr16_receive_sub;
             ros::Subscriber client_receive_sub;
             ros::Subscriber odometry_sub;
 
@@ -137,6 +143,7 @@ namespace decision_tree
             string robot_position_sub_topic;
             string robot_status_sub_topic;
             string client_command_sub_topic;
+            string dr16_receive_sub_topic;
             string client_receive_sub_topic;
             string vision_mode_switch_topic;
             string odometry_topic;
@@ -152,6 +159,7 @@ namespace decision_tree
             void Robot_Position_Callback(const gary_msgs::RobotPosition::ConstPtr msg);
             void Robot_Status_Callback(const gary_msgs::RobotStatus::ConstPtr msg);
             void Client_Command_Callback(const gary_msgs::ClientCommand::ConstPtr msg);
+            void DR16_Receive_Callback(const gary_msgs::DR16Receiver::ConstPtr msg);
             void Client_Receive_Callback(const gary_msgs::ClientReceive::ConstPtr msg);
             void Odometry_Callback(const nav_msgs::Odometry::ConstPtr msg);
             void Client_Command_State_Transform();
