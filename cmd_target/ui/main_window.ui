@@ -6,84 +6,38 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>656</width>
-    <height>445</height>
+    <width>908</width>
+    <height>553</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLineEdit" name="WriteX">
+   <widget class="QOpenGLWidget" name="openGLWidget">
     <property name="geometry">
      <rect>
-      <x>360</x>
-      <y>140</y>
-      <width>191</width>
-      <height>25</height>
+      <x>40</x>
+      <y>40</y>
+      <width>840</width>
+      <height>450</height>
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="NavigationXLabel">
+   <widget class="QPushButton" name="DirectcmdButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>140</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>NavigationX</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="NavigationYLabel">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>220</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>NavigationY</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="WriteY">
-    <property name="geometry">
-     <rect>
-      <x>360</x>
-      <y>220</y>
-      <width>191</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="ClearButton">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>300</y>
-      <width>89</width>
+      <x>390</x>
+      <y>10</y>
+      <width>161</width>
       <height>25</height>
      </rect>
     </property>
     <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="SaveButton">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>300</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Save</string>
+     <string>OpenDirectCMD</string>
     </property>
    </widget>
   </widget>
@@ -92,7 +46,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>656</width>
+     <width>908</width>
      <height>22</height>
     </rect>
    </property>

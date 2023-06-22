@@ -1,0 +1,1 @@
+uic -g cpp ../ui/cmd_window.ui -o ../include/ui_cmd_window.h

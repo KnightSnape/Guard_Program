@@ -1,0 +1,10 @@
+<launch>
+
+    <node name="Livox_Controller" pkg="Livox_Controller" type="Livox_Controller" output="screen"/>
+
+    <node name="navigation_node" pkg="navigation_node" type="navigation_node" output="screen"/>
+
+    <node name="cmd_target" pkg="cmd_target" type="cmd_target" output="screen"/>
+
+    <node name="armor_decision" pkg="armor_decision" type="armor_decision" output="log"/>
+</launch>
