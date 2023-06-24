@@ -1,6 +1,5 @@
 #pragma once
 
-#include"cmdwindow.h"
 #include<Eigen/Eigen>
 #include<QMainWindow>
 #include<QSignalMapper>
@@ -40,7 +39,6 @@ class MainWindow : public QMainWindow
         void mouseClicked(const QPoint& pos);
 
     private:
-        Navigation_Window::Ptr navigation_window;
         Ui::MainWindow ui;
         QNode::Ptr qnode;
         QWidget *widget;
