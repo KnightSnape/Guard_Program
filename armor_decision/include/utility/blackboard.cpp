@@ -80,6 +80,10 @@ Blackboard::Blackboard():is_pitch_now_received(false),
     //注意初始化在启动区，越偏离放置位越容易出事(TODO: 使用uwb初始化它，当开机启动后收到的第一个点就是它放置的点)
     sentry_map_point[0] = 170;
     sentry_map_point[1] = 225;   
+
+    pos_manager.set_pos_x_zero(sentry_map_point[0]);
+    pos_manager.set_pos_y_zero(sentry_map_point[1]);
+
     now_id = 0;
     
     average_time = 0.01;
@@ -214,7 +218,7 @@ void Blackboard::Odometry_Callback(const nav_msgs::Odometry::ConstPtr msg)
     pos_manager.set_guard_world_pos(odometry_msg);
     pos_manager.set_guard_rotate_q(odometry_msg);
     pos_manager.setRPY();
-    sentry_map_point = pos_manager.world_to_map(pos_manager.get_guard_world_pos());
+    sentry_map_point = pos_manager.robot_to_map(pos_manager.get_guard_world_pos());
     if(robot_status_msg.robot_id == (uint8_t)107)
     sentry_map_point = pos_manager.inverse_point(sentry_map_point);
     odometry_mutex.unlock();
@@ -224,92 +228,92 @@ void Blackboard::Client_Command_State_Transform()
 {
     if((char)client_command_msg.keyboard_key_pressed == 'Q')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_TARGET");
+        ROS_INFO("Receive to cmd command: MOVE_TARGET");
         command_mode = CMD_Command::MOVE_TARGET;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'R')
     {
-        ROS_DEBUG("Receive to cmd command: REPOS");
+        ROS_INFO("Receive to cmd command: REPOS");
         command_mode = CMD_Command::REPOS;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'Z')
     {
-        ROS_DEBUG("Receive to cmd command: STOP_MOVING");
+        ROS_INFO("Receive to cmd command: STOP_MOVING");
         command_mode = CMD_Command::STOP_MOVING;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'X')
     {
-        ROS_DEBUG("Receive to cmd command: STOP_SHOOT");
+        ROS_INFO("Receive to cmd command: STOP_SHOOT");
         command_mode = CMD_Command::STOP_SHOOT;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'E')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_UP");
+        ROS_INFO("Receive to cmd command: MOVE_UP");
         command_mode = CMD_Command::MOVE_UP;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'D')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_DOWN");
+        ROS_INFO("Receive to cmd command: MOVE_DOWN");
         command_mode = CMD_Command::MOVE_DOWN;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'S')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_LEFT");
+        ROS_INFO("Receive to cmd command: MOVE_LEFT");
         command_mode = CMD_Command::MOVE_LEFT;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'F')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_RIGHT");
+        ROS_INFO("Receive to cmd command: MOVE_RIGHT");
         command_mode = CMD_Command::MOVE_RIGHT;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'Y')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_RIGHT_UP");
+        ROS_INFO("Receive to cmd command: MOVE_RIGHT_UP");
         command_mode = CMD_Command::MOVE_RIGHT_UP;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'H')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_RIGHT_DOWN");
+        ROS_INFO("Receive to cmd command: MOVE_RIGHT_DOWN");
         command_mode = CMD_Command::MOVE_RIGHT_DOWN;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'G')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_LEFT_UP");
+        ROS_INFO("Receive to cmd command: MOVE_LEFT_UP");
         command_mode = CMD_Command::MOVE_LEFT_UP;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'J')
     {
-        ROS_DEBUG("Receive to cmd command: MOVE_LEFT_DOWN");
+        ROS_INFO("Receive to cmd command: MOVE_LEFT_DOWN");
         command_mode = CMD_Command::MOVE_LEFT_DOWN;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'V')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_HOME");
+        ROS_INFO("Receive to cmd command: TARGET_TO_HOME");
         command_mode = CMD_Command::TARGET_TO_HOME;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'N')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_PATRAL_AREA");
+        ROS_INFO("Receive to cmd command: TARGET_TO_PATRAL_AREA");
         command_mode = CMD_Command::TARGET_TO_PATRAL_AREA;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'K')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_MY_OUTPOST");
+        ROS_INFO("Receive to cmd command: TARGET_TO_MY_OUTPOST");
         command_mode = CMD_Command::TARGET_TO_MY_OUTPOST;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'L')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_MY_STEP");
+        ROS_INFO("Receive to cmd command: TARGET_TO_MY_STEP");
         command_mode = CMD_Command::TARGET_TO_MY_STEP;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'U')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_ENEMY_OUTPOST");
+        ROS_INFO("Receive to cmd command: TARGET_TO_ENEMY_OUTPOST");
         command_mode = CMD_Command::TARGET_TO_ENEMY_OUTPOST;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'O')
     {
-        ROS_DEBUG("Receive to cmd command: TARGET_TO_ENEMY_PATRAL");
+        ROS_INFO("Receive to cmd command: TARGET_TO_ENEMY_PATRAL");
         command_mode = CMD_Command::TARGET_TO_ENEMY_PATRAL;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'C')
@@ -319,7 +323,7 @@ void Blackboard::Client_Command_State_Transform()
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'T')
     {
-        ROS_DEBUG("Receive to cmd command: STOP_ROTATE");
+        ROS_INFO("Receive to cmd command: STOP_ROTATE");
         command_mode = CMD_Command::STOP_ROTATE;
     }
     else if((char)client_command_msg.keyboard_key_pressed == (char)0)

@@ -155,7 +155,7 @@ int Graph::findLatestpoint(Point point)
 bool Graph::CheckOnTarget(Point point,int target_id)
 {
     cv::Point target_point = nodes[target_id].node_place;
-    return Distance(point,target_point) < 5;
+    return Distance(point,target_point) < 4;
 }
 //更新序列点
 void Graph::updatePoint(Point point,int &start_id,int target_id,int &target_state,int &next_target)
@@ -173,6 +173,7 @@ void Graph::updatePoint(Point point,int &start_id,int target_id,int &target_stat
     {
         start_id = next_target;
         next_target = get_first_point(next_target,target_id);
+        target_state = 2;
     }
     //如果已经完全到达该位置，直接显示已经到达
     else if(CheckOnTarget(point,next_target) && next_target == target_id)

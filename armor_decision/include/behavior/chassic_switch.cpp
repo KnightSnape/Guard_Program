@@ -45,11 +45,13 @@ BehaviorState Chassis_Switch::Update()
         //更新一轮
         blackboard_ptr_->graph.updatePoint(sentry_point,blackboard_ptr_->now_id,blackboard_ptr_->navigation_target_id,
                                             target_state,blackboard_ptr_->next_target_id);
-        ROS_DEBUG("You are in id: %d,on point:(%d,%d)",blackboard_ptr_->now_id,sentry_point.x,sentry_point.y);
+        ROS_WARN("You are in id: %d,on point:(%d,%d)",blackboard_ptr_->now_id,sentry_point.x,sentry_point.y);
+        ROS_WARN("Your target is: %d,and the next target is: %d",blackboard_ptr_->navigation_target_id,blackboard_ptr_->next_target_id);
+        ROS_WARN("Target State is: %d",target_state);
         //如果已经到达目标，使用STANDBY模式停留
         if(target_state == 1)
         {
-            ROS_DEBUG("On Target");
+            ROS_INFO("On Target,You are in: %d",blackboard_ptr_->now_id);
             chassis_exe_ptr_->pub_stop_signal();
             blackboard_ptr_->standBy_control.is_standby = true;
             blackboard_ptr_->standBy_control.remain_control_time = blackboard_ptr_->standBy_control.max_control_time;
@@ -107,7 +109,6 @@ BehaviorState Chassis_Switch::Update()
             Eigen::Vector2i target_2d = blackboard_ptr_->pos_manager.world_to_map(target_eigen);
             if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
             target_2d = blackboard_ptr_->pos_manager.inverse_point(target_2d);
-
             cv::Point target_point = cv::Point(target_2d.x(),target_2d.y());
             int id = blackboard_ptr_->graph.CheckInPoint(target_point);
             if(id == -1)
@@ -120,6 +121,7 @@ BehaviorState Chassis_Switch::Update()
             }
             blackboard_ptr_->navigation_target_id = id;
             //如果在其他位置，进入navigation模式，并发送导航所对应的目标
+            //ROS_WARN("the point is (%d,%d)",sentry_point.x,sentry_point.y);
             blackboard_ptr_->now_id = blackboard_ptr_->graph.CheckInPoint(sentry_point);
             if(blackboard_ptr_->now_id == -1)
             {
@@ -129,6 +131,18 @@ BehaviorState Chassis_Switch::Update()
             {
                 blackboard_ptr_->next_target_id = blackboard_ptr_->graph.get_first_point(blackboard_ptr_->now_id,blackboard_ptr_->navigation_target_id);
             }
+            ROS_WARN("now id is: %d,the target id is:%d,the next target id is:%d",blackboard_ptr_->now_id,id,blackboard_ptr_->next_target_id);
+            cv::Point target_true_point = blackboard_ptr_->graph.get_node_point(blackboard_ptr_->next_target_id);
+            Eigen::Vector2i target_point_eigen{target_true_point.x,target_true_point.y};
+            if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
+            target_point_eigen = blackboard_ptr_->pos_manager.inverse_point(target_point_eigen);
+            Eigen::Vector3d target_pos_world = blackboard_ptr_->pos_manager.map_to_world(target_point_eigen);
+            ROS_DEBUG("we are in:(%d,%d)",sentry_point.x,sentry_point.y);   
+            ROS_DEBUG("the target is in:(%d,%d)",target_point_eigen.x(),target_point_eigen.y());
+            ROS_DEBUG("the target 3d point is:(%f,%f,%f)",target_pos_world.x(),target_pos_world.y(),target_pos_world.z());
+            geometry_msgs::PointStamped target_pos_msg = blackboard_ptr_->pos_manager.transfer_to_msg(target_pos_world);
+            chassis_exe_ptr_->pub_nav_point(target_pos_msg);
+            ROS_DEBUG("navigation start");
             blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
             return BehaviorState::SUCCESS;
         }

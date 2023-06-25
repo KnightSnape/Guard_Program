@@ -114,7 +114,7 @@ int main(int argc,char **argv)
                 double final_speed = 0;
                 if(norm > 2)
                     final_speed = 1.0;
-                else if(norm > 0.1 && norm <= 4)
+                else if(norm > 0.06 && norm <= 4)
                     final_speed = 0.5;
                 else 
                     final_speed = 0;
