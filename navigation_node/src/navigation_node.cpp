@@ -42,6 +42,16 @@ void target_callback(const geometry_msgs::PointStamped::ConstPtr msg)
     is_start = true;
 }
 
+void velocity_control(double norm,double &final_speed)
+{
+    if(norm > 2)
+        final_speed = 1.2;
+    else if(norm > 0.01 && norm < 2)
+        final_speed = 0.6 + 0.4 * norm; 
+    else
+        final_speed = 0;
+}
+
 int main(int argc,char **argv)
 {
     ros::init(argc,argv,"navigation_node");
@@ -100,12 +110,12 @@ int main(int argc,char **argv)
             double cos_angle_temp = (delta_pos.x() * e_pos2d.x() + delta_pos.y() * e_pos2d.y()) / (delta_pos.norm() * e_pos2d.norm());
             if(delta_angle > 5.0 / 180 * M_PI)
             {
-                final_angle = 20.0 / 180 * M_PI;
+                final_angle = 50.0 / 180 * M_PI;
                 use_final_angle = true;
             }
             if(delta_angle < -5.0 / 180 * M_PI)
             {
-                final_angle = -20.0 / 180 * M_PI;
+                final_angle = -50.0 / 180 * M_PI;
                 use_final_angle = true;
             }
             Eigen::Vector3d final_twist = Eigen::Vector3d::Zero();
@@ -113,9 +123,9 @@ int main(int argc,char **argv)
             {
                 double final_speed = 0;
                 if(norm > 2)
-                    final_speed = 1.0;
-                else if(norm > 0.06 && norm <= 4)
-                    final_speed = 0.5;
+                    final_speed = 1.2;
+                else if(norm > 0.06 && norm <= 2)
+                    final_speed = 0.8;
                 else 
                     final_speed = 0;
                 final_twist.x() = final_speed;

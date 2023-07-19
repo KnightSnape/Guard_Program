@@ -19,7 +19,7 @@ Eigen::Vector2i Pos_Manager::world_to_map(const Eigen::Vector3d &pw)
 {
     Eigen::Vector2i map_pos;
     map_pos.x() = ((int)(pw.x() / 28.0 * 840));
-    map_pos.y() = (450 - (int)(pw.y() / 15.0 * 450));
+    map_pos.y() = ((int)(pw.y() / 15.0 * 450));
     return map_pos;
 }
 
