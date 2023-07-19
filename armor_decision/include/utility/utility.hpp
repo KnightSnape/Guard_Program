@@ -138,10 +138,10 @@ enum class CMD_Command
     TARGET_TO_ENEMY_PATRAL = 20,//敌方巡逻区前
     START_ROTATE = 21,//开启小陀螺
     STOP_ROTATE = 22,//停止小陀螺
-    MOVE_RIGHT_UP = 23,
-    MOVE_RIGHT_DOWN = 24,
-    MOVE_LEFT_UP = 25,
-    MOVE_LEFT_DOWN = 26,
+    MOVE_RIGHT_UP = 23,//强制向右上方移动
+    MOVE_RIGHT_DOWN = 24,//强制向右下方移动
+    MOVE_LEFT_UP = 25,//强制向左上方移动
+    MOVE_LEFT_DOWN = 26,//强制向左下方移动
 };
 
 //底盘状态

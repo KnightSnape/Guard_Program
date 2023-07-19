@@ -146,6 +146,69 @@ BehaviorState Chassis_Switch::Update()
             blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
             return BehaviorState::SUCCESS;
         }
+        if(checktarget())
+        {
+            cv::Point target_point_2d;
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_OUTPOST)
+            {
+                target_point_2d = cv::Point(460,88);
+            }
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_PATRAL)
+            {
+                target_point_2d = cv::Point(619,228);
+            }
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_HOME)
+            {
+                target_point_2d = cv::Point(170,225);
+            }
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_OUTPOST)
+            {
+                target_point_2d = cv::Point(378,367);
+            }
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_STEP)
+            {
+                target_point_2d = cv::Point(381,18);
+            }
+            if(blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_PATRAL_AREA)
+            {
+                target_point_2d = cv::Point(105,16);
+            }
+            int id = blackboard_ptr_->graph.CheckInPoint(target_point_2d);
+            if(id == -1)
+            {
+                ROS_ERROR("Initial Wrong");
+                blackboard_ptr_->standBy_control.is_standby = true;
+                blackboard_ptr_->standBy_control.remain_control_time = blackboard_ptr_->standBy_control.max_control_time;
+                blackboard_ptr_->chassis_mode = Chassis_Mode::STANDBY;
+                return BehaviorState::SUCCESS;
+            }
+            blackboard_ptr_->navigation_target_id = id;
+            //如果在其他位置，进入navigation模式，并发送导航所对应的目标
+            //ROS_WARN("the point is (%d,%d)",sentry_point.x,sentry_point.y);
+            blackboard_ptr_->now_id = blackboard_ptr_->graph.CheckInPoint(sentry_point);
+            if(blackboard_ptr_->now_id == -1)
+            {
+                blackboard_ptr_->next_target_id = blackboard_ptr_->graph.findLatestpoint(sentry_point);
+            }
+            else
+            {
+                blackboard_ptr_->next_target_id = blackboard_ptr_->graph.get_first_point(blackboard_ptr_->now_id,blackboard_ptr_->navigation_target_id);
+            }
+            ROS_WARN("now id is: %d,the target id is:%d,the next target id is:%d",blackboard_ptr_->now_id,id,blackboard_ptr_->next_target_id);
+            cv::Point target_true_point = blackboard_ptr_->graph.get_node_point(blackboard_ptr_->next_target_id);
+            Eigen::Vector2i target_point_eigen{target_true_point.x,target_true_point.y};
+            if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
+            target_point_eigen = blackboard_ptr_->pos_manager.inverse_point(target_point_eigen);
+            Eigen::Vector3d target_pos_world = blackboard_ptr_->pos_manager.map_to_world(target_point_eigen);
+            ROS_DEBUG("we are in:(%d,%d)",sentry_point.x,sentry_point.y);   
+            ROS_DEBUG("the target is in:(%d,%d)",target_point_eigen.x(),target_point_eigen.y());
+            ROS_DEBUG("the target 3d point is:(%f,%f,%f)",target_pos_world.x(),target_pos_world.y(),target_pos_world.z());
+            geometry_msgs::PointStamped target_pos_msg = blackboard_ptr_->pos_manager.transfer_to_msg(target_pos_world);
+            chassis_exe_ptr_->pub_nav_point(target_pos_msg);
+            ROS_DEBUG("navigation start");
+            blackboard_ptr_->chassis_mode = Chassis_Mode::NAVIGATING;
+            return BehaviorState::SUCCESS;
+        }
         if(blackboard_ptr_->command_mode == CMD_Command::REPOS)
         {
             //TODO(Knight):Add method
@@ -458,10 +521,26 @@ bool Chassis_Switch::checkchassic()
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_UP) || 
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_UP) ||
                     (blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_DOWN) ||
-                    (blackboard_ptr_->command_mode == CMD_Command::LOOKAT);
+                    (blackboard_ptr_->command_mode == CMD_Command::LOOKAT) || 
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_OUTPOST) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_PATRAL) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_HOME) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_OUTPOST) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_STEP) ||
+                    (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_PATRAL_AREA);
 
     return check; 
 }
 
+bool Chassis_Switch::checktarget()
+{
+    bool check = (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_OUTPOST) ||
+                 (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_ENEMY_PATRAL) ||
+                 (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_HOME) ||
+                 (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_OUTPOST) ||
+                 (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_MY_STEP) ||
+                 (blackboard_ptr_->command_mode == CMD_Command::TARGET_TO_PATRAL_AREA);
+    return check;
+}
 
 }

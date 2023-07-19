@@ -215,3 +215,80 @@ double Pos_Manager::calculate_relative_angle(const Eigen::Vector2i &a1, const Ei
    double angle = atan2(cross,dot);
    return angle;
 }
+
+double Pos_Manager::calculate_relative_angle(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2)
+{
+   Eigen::Vector2d delta_pos = a2 - a1;
+   Eigen::Vector2d x_pos{1,0};
+   double dot = (double)(delta_pos.x() * x_pos.x() + delta_pos.y() * x_pos.y());
+   double cross = (double)(x_pos.x() * delta_pos.y() - x_pos.y() * delta_pos.x());
+   double angle = atan2(cross,dot);
+   return angle;    
+}
+
+bool Pos_Manager::navigation_process(bool is_navigation_signal,Eigen::Vector3d target_point,Eigen::Vector3d self_point,geometry_msgs::Twist& twist_msg)
+{
+    if(!is_navigation_signal)
+        return false;
+    Eigen::Vector2d target_pos_2d{target_point[0],target_point[1]};
+    Eigen::Vector2d self_pos_2d{self_point[0],self_point[1]};
+
+    Eigen::Vector2d delta_pos = target_pos_2d - self_pos_2d;
+    Eigen::Vector2d x_pos{1,0};
+
+    double norm = delta_pos.norm();
+    yaw = yaw + (0.5 * M_PI);
+    if(yaw > M_PI)
+        yaw -= 2 * M_PI;
+
+    if(norm == 0)
+        return false;
+
+    double angle = calculate_relative_angle(target_pos_2d,self_pos_2d);
+    double delta_angle = yaw - angle;
+    if(delta_angle < -M_PI)
+        delta_angle += 2 * M_PI;
+    if(delta_angle > M_PI)
+        delta_angle -= 2 * M_PI;
+    bool use_final_angle = false;
+    double final_angle = 0.0;
+    Eigen::Vector2d e_pos2d{cos(yaw),sin(yaw)};
+
+    double cos_angle_temp = (delta_pos.x() * e_pos2d.x() + delta_pos.y() * e_pos2d.y()) / (delta_pos.norm() * e_pos2d.norm());
+
+    if(delta_angle > 5.0 / 180 * M_PI)
+    {
+        final_angle = 20.0 / 180 * M_PI;
+        use_final_angle = true;
+    }
+    if(delta_angle < -5.0 / 180 * M_PI)
+    {
+        final_angle = -20.0 / 180 * M_PI;
+        use_final_angle = true;
+    }
+
+    Eigen::Vector3d final_twist = Eigen::Vector3d::Zero();
+
+    if(!use_final_angle)
+    {
+        double final_speed = 0;
+        if(norm > 2)
+            final_speed = 1.0;
+        else if(norm > 0.06 && norm <= 4)
+            final_speed = 0.5;
+        else 
+            final_speed = 0;
+        final_twist.x() = final_speed;
+        final_twist.y() = 0.0;
+        final_twist.z() = 0.0;
+    }
+
+    twist_msg.angular.x = 0.0;
+    twist_msg.angular.y = 0.0;
+    twist_msg.angular.z = final_angle;
+    twist_msg.linear.x = final_twist.x();
+    twist_msg.linear.y = final_twist.y();
+    twist_msg.linear.z = final_twist.z();
+
+    return true;
+}

@@ -21,6 +21,7 @@ namespace decision_tree
         private:
             BehaviorState Update();
             bool checkchassic();
+            bool checktarget();
 
 
     };

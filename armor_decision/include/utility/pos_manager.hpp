@@ -26,6 +26,8 @@ class Pos_Manager
         void speed_process(float &twist_x,float &twist_y,int mode,float &yaw_angle);
         void rotate_process(float& yaw_angle,const float& target_yaw_angle);
         double calculate_relative_angle(const Eigen::Vector2i &a1, const Eigen::Vector2i &a2);
+        double calculate_relative_angle(const Eigen::Vector2d &a1, const Eigen::Vector2d &a2);
+        bool navigation_process(bool is_navigation_signal,Eigen::Vector3d target_point,Eigen::Vector3d self_point,geometry_msgs::Twist& twist_msg);
         
 
     private:
