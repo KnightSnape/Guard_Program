@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(armor_decision)
 
-set(ngraph_DIR "/opt/intel/openvino_2022/runtime/cmake")
-set(InferenceEngine_DIR "/opt/intel/openvino_2022/runtime/cmake")
 
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
@@ -18,8 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   roslaunch
 )
 
-find_package(ngraph REQUIRED)
-find_package(InferenceEngine REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -64,6 +60,4 @@ target_link_libraries(
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${YAML_CPP_LIBRARIES}
-  ${InferenceEngine_LIBRARIES}
-  ${ngraph_LIBRARIES}
 )

@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_msgs
 )
-
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(PCL REQUIRED)
