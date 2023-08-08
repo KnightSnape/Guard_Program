@@ -5,7 +5,7 @@ namespace decision_tree
     decision_node::decision_node()
     {
         ros::NodeHandle nh;
-        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
+        ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug);
         loop_rate_ = 100;//10Hz or 30Hz, 控制处理频率
 
         //导入新地图

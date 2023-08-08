@@ -10,7 +10,7 @@ max_command_control_remain_time: 40.0
 max_shoot_control_remain_time: 5.0
 max_standby_control_remain_time: 5.0 
 max_autoaim_control_remain_time: 5.0
-max_autoaim_state_control_remain_time: 3.0
+max_autoaim_state_control_remain_time: 2.0
 
 pitch_upper_threshold: 8.0
 pitch_lower_threshold: -8.0
@@ -18,5 +18,5 @@ yaw_work_speed: 0.20
 pitch_rotate_speed: 0.10
 rotate_freq: 100.0
 k_autoaim: 0.2
-x_offset: 0.02
-y_offset: 0.0
+x_offset: -0.0108
+y_offset: 0.002

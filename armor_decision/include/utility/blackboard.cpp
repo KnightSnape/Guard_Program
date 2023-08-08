@@ -72,7 +72,7 @@ Blackboard::Blackboard():is_pitch_now_received(false),
     navigation_target_id = 0;
 
     chassis_mode = Chassis_Mode::INITIAL;
-    gimbal_mode = Gimbal_Mode::SCANNING;
+    gimbal_mode = Gimbal_Mode::HIGH_SPEED;
     last_gimbal_mode = Gimbal_Mode::NO_FORCE;
     command_mode = CMD_Command::INITIAL;
     autoaim_mode = AutoAim_Mode::INITIAL;
@@ -298,13 +298,13 @@ void Blackboard::Client_Command_State_Transform()
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'K')
     {
-        ROS_INFO("Receive to cmd command: TARGET_TO_MY_OUTPOST");
-        command_mode = CMD_Command::TARGET_TO_MY_OUTPOST;
+        ROS_INFO("Receive to cmd command: TRANSFORM_TO_HIGH_SPEED");
+        command_mode = CMD_Command::TRANSFORM_TO_HIGH_SPEED;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'L')
     {
         ROS_INFO("Receive to cmd command: TARGET_TO_MY_STEP");
-        command_mode = CMD_Command::TARGET_TO_MY_STEP;
+        command_mode = CMD_Command::TRANSFORM_TO_SCANNING;
     }
     else if((char)client_command_msg.keyboard_key_pressed == 'U')
     {

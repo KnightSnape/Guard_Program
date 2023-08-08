@@ -20,6 +20,7 @@ namespace decision_tree
             const AutoAim_executor::Ptr &autoaim_executor);
         private:
             BehaviorState Update();
+            bool checkGimbal();
     };  
 
 
