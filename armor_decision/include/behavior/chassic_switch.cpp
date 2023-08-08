@@ -263,7 +263,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                        2,twist_yaw_angle);   
             }
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_DOWN)
         {
@@ -278,7 +277,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         4,twist_yaw_angle);
             }
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT)
@@ -294,7 +292,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         1,twist_yaw_angle);
             }
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT)
         {
@@ -309,7 +306,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         3,twist_yaw_angle);              
             }
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_UP)
@@ -324,7 +320,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         8,twist_yaw_angle);              
             } 
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN)
         {
@@ -337,8 +332,7 @@ BehaviorState Chassis_Switch::Update()
             {
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         6,twist_yaw_angle);              
-            } 
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
+            }  
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_LEFT_UP)
         {
@@ -352,7 +346,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         7,twist_yaw_angle);              
             } 
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_RIGHT_DOWN)
         {
@@ -366,21 +359,6 @@ BehaviorState Chassis_Switch::Update()
                 blackboard_ptr_->pos_manager.speed_process(blackboard_ptr_->command_control.twist_x,blackboard_ptr_->command_control.twist_y,
                                                         5,twist_yaw_angle);              
             }
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING; 
-        }
-        else if(blackboard_ptr_->command_mode == CMD_Command::LOOKAT)
-        {
-            Eigen::Vector3d target_eigen{blackboard_ptr_->client_command_msg.target_position_x,
-                                         blackboard_ptr_->client_command_msg.target_position_y,
-                                         blackboard_ptr_->client_command_msg.target_position_z};
-            Eigen::Vector2i target_2d = blackboard_ptr_->pos_manager.world_to_map(target_eigen);
-            if(blackboard_ptr_->robot_status_msg.robot_id == (uint8_t)107)
-                target_2d = blackboard_ptr_->pos_manager.inverse_point(target_2d);
-            Eigen::Vector3d pos_robot = blackboard_ptr_->pos_manager.get_guard_world_pos();
-            Eigen::Vector2i self_2d = blackboard_ptr_->pos_manager.robot_to_map(pos_robot);
-            double target_angle = - blackboard_ptr_->pos_manager.calculate_relative_angle(self_2d,target_2d);
-            blackboard_ptr_->pos_manager.rotate_process(twist_yaw_angle,target_angle);
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::HIGH_SPEED;
         }
         else if(blackboard_ptr_->command_mode == CMD_Command::MOVE_UP_ABS)
         {
@@ -410,7 +388,6 @@ BehaviorState Chassis_Switch::Update()
         {
             blackboard_ptr_->command_control.twist_x = 0;
             blackboard_ptr_->command_control.twist_y = 0;
-            blackboard_ptr_->gimbal_mode = Gimbal_Mode::SCANNING;
         }
         geometry_msgs::Twist twist;
         twist.angular.x = 0.0;

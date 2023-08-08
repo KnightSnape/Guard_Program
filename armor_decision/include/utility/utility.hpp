@@ -142,6 +142,8 @@ enum class CMD_Command
     MOVE_RIGHT_DOWN = 24,//强制向右下方移动
     MOVE_LEFT_UP = 25,//强制向左上方移动
     MOVE_LEFT_DOWN = 26,//强制向左下方移动
+    TRANSFORM_TO_HIGH_SPEED = 27,//强制转换状态为高角度扫描
+    TRANSFORM_TO_SCANNING = 28,//强制转换状态为360扫描
 };
 
 //底盘状态

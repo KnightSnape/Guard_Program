@@ -19,7 +19,7 @@ class Gimbal_executor
         void get_yaw_now(gary_msgs::DualLoopPIDWithFilter msg);
         void get_autoaim_target(gary_msgs::AutoAIM msg);
         void get_init_gimbal_yaw_pos();
-        void get_target_angle(Eigen::Vector2d target_pos_world,Eigen::Vector2d self_pos_world);
+        void set_target_angle(float angle);
 
         double gimbal_pitch_min{};
         double gimbal_pitch_max{};
@@ -51,7 +51,7 @@ class Gimbal_executor
         struct gimbal_yaw_set_calc_s
         {
             double cycle;
-            double angle;
+            volatile double angle;
         }gimbal_yaw_set_calc;
         
         std_msgs::Float64 pitch_msg;
